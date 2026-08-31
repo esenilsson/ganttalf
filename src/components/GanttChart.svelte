@@ -81,7 +81,7 @@
   const EDGE = 7 // px hit zone for resize handles
 </script>
 
-<div class="overflow-x-auto">
+<div class="overflow-x-auto p-2 sm:p-4">
   <svg
     bind:this={svgEl}
     xmlns="http://www.w3.org/2000/svg"

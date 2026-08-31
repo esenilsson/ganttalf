@@ -243,7 +243,7 @@
     {#if !store.readonly}
       <section class="flex flex-col gap-2">
         <h2 class="text-[11px] font-extrabold uppercase tracking-[0.1em] text-gt-ink-faint">
-          Activities — edit here or drag bars/edges/milestones directly on the chart
+          Activities — edit here or drag bars/edges/milestones directly on the chart · Enter / ↑ ↓ jump between rows (⌥↑↓ in date fields)
         </h2>
         <RowTable />
       </section>

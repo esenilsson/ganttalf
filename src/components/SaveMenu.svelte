@@ -101,7 +101,7 @@
 
 <div class="flex items-center">
   <input
-    class="h-9 w-44 rounded-l-md border border-input bg-card px-3 text-sm shadow-sm transition-colors placeholder:text-gt-ink-faint focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+    class="h-9 w-44 rounded-l-[6px] border border-input bg-card px-3 text-sm shadow-sm transition-colors placeholder:text-gt-ink-faint focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
     placeholder="Untitled"
     bind:value={store.chartName}
     onkeydown={(e) => e.key === 'Enter' && save()}
@@ -114,7 +114,7 @@
   </button>
   <div class="relative">
     <button
-      class="h-9 rounded-r-md border-y border-r border-input bg-card px-2 text-sm shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+      class="h-9 rounded-r-[6px] border-y border-r border-input bg-card px-2 text-sm shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
       aria-label="Saved charts"
       onclick={(e) => { e.stopPropagation(); toggleList() }}
     >▾</button>

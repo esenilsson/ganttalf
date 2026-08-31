@@ -2,6 +2,26 @@
   import { store, addRow, deleteRow, moveRow } from '../lib/stores.svelte.js'
   import Button from './ui/Button.svelte'
 
+  let rootEl
+
+  // Spreadsheet-style navigation: Enter / Shift+Enter and ↑ / ↓ move focus to
+  // the same column in the next/previous row. Date inputs keep plain arrows
+  // for stepping the date — hold Alt to move rows there instead.
+  function onCellKey(e, row, col) {
+    const isDate = e.target.type === 'date'
+    let dir = 0
+    if (e.key === 'Enter') dir = e.shiftKey ? -1 : 1
+    else if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && (!isDate || e.altKey)) {
+      dir = e.key === 'ArrowDown' ? 1 : -1
+    }
+    if (!dir) return
+    const next = rootEl?.querySelector(`input[data-cell="${row + dir}:${col}"]`)
+    if (!next) return
+    e.preventDefault()
+    next.focus()
+    if (next.type === 'text') next.select()
+  }
+
   const cols = [
     { key: 'group', label: 'Group', type: 'text', w: 'w-32' },
     { key: 'activity', label: 'Activity', type: 'text', w: 'min-w-64' },
@@ -15,7 +35,7 @@
   ]
 </script>
 
-<div class="overflow-x-auto rounded-xl border border-gt-line bg-gt-paper">
+<div bind:this={rootEl} class="overflow-x-auto rounded-xl border border-gt-line bg-gt-paper">
   <table class="w-full caption-bottom text-sm">
     <thead>
       <tr class="border-b border-gt-line bg-gt-rail">
@@ -28,21 +48,25 @@
     <tbody>
       {#each store.rows as row, i (row.id)}
         <tr class="border-b border-gt-line-soft transition-colors duration-[120ms] hover:bg-gt-rail">
-          {#each cols as c}
+          {#each cols as c, ci}
             <td class="px-1 py-1 align-middle">
               {#if c.type === 'date'}
                 <input
                   type="date"
-                  class="h-8 w-full rounded-md border border-input bg-transparent px-2 text-sm tabular-nums focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  data-cell="{i}:{ci}"
+                  class="h-8 w-full rounded-[6px] border border-input bg-transparent px-2 text-sm tabular-nums focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                   value={row[c.key] ?? ''}
                   onchange={(e) => (row[c.key] = e.target.value || null)}
+                  onkeydown={(e) => onCellKey(e, i, ci)}
                 />
               {:else}
                 <input
                   type="text"
-                  class="h-8 w-full rounded-md border border-input bg-transparent px-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  data-cell="{i}:{ci}"
+                  class="h-8 w-full rounded-[6px] border border-input bg-transparent px-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                   value={row[c.key]}
                   oninput={(e) => (row[c.key] = e.target.value)}
+                  onkeydown={(e) => onCellKey(e, i, ci)}
                 />
               {/if}
             </td>
