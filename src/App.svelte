@@ -18,7 +18,6 @@
   import ExportMenu from './components/ExportMenu.svelte'
   import UserMenu from './components/UserMenu.svelte'
   import Button from './components/ui/Button.svelte'
-  import Logo from './components/ui/Logo.svelte'
 
   let chart = $state(null)
   let shareState = $state(null) // snapshot link: null | 'copied' | 'ready'
@@ -180,8 +179,7 @@
           history.replaceState(null, '', '/')
         }}
       >
-        <Logo size={22} />
-        <span class="font-display text-[19px] font-medium leading-[1.18] text-gt-ink">ganttalf</span>
+        <span class="text-xl font-bold tracking-tight text-gt-ink">🧙 Ganttalf</span>
       </a>
     </h1>
     {#if hasRows && !store.readonly}

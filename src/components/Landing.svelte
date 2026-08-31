@@ -1,6 +1,5 @@
 <script>
   import DropZone from './DropZone.svelte'
-  import Logo from './ui/Logo.svelte'
 
   // Pastels carry category — one swatch per feature, same job as in the plan
   const features = [
@@ -57,14 +56,14 @@
     <DropZone />
   </div>
 
-  <div class="h-0.5 w-full bg-gt-ink"></div>
+  <div class="h-px w-full bg-gt-ink"></div>
 
   <!-- Workspace preview — drawn in CSS, no bitmaps -->
-  <figure class="w-full border-2 border-gt-ink bg-gt-paper" aria-label="The ganttalf workspace">
+  <figure class="w-full rounded-[6px] border border-gt-ink bg-gt-paper p-3 sm:p-5" aria-label="The ganttalf workspace">
+    <div class="overflow-hidden rounded-[4px] border border-gt-line">
     <div class="flex items-center justify-between gap-5 border-b border-gt-line bg-gt-rail px-4 py-2.5">
       <div class="flex items-center gap-3">
-        <Logo size={22} />
-        <span class="font-display text-[19px] font-medium leading-[1.18]">ganttalf</span>
+        <span class="text-[15px] font-bold tracking-tight">🧙 Ganttalf</span>
         <span class="h-[18px] w-px bg-gt-line"></span>
         <span class="text-[13px] text-gt-ink-muted">Q3 roadmap</span>
       </div>
@@ -100,16 +99,17 @@
         {/each}
       </div>
     </div>
-    <figcaption class="border-t border-gt-line bg-gt-rail px-4 py-3 text-[11px] text-gt-ink-muted">
+    </div>
+    <figcaption class="px-1 pt-3 text-[11px] text-gt-ink-muted">
       Pastels carry category, ink carries the critical path, brick carries risk — three jobs, no overlap.
     </figcaption>
   </figure>
 
-  <div class="h-0.5 w-full bg-gt-ink"></div>
+  <div class="h-px w-full bg-gt-ink"></div>
 
   <div class="grid w-full gap-5 text-left sm:grid-cols-2 lg:grid-cols-4">
     {#each features as f (f.title)}
-      <div class="flex flex-col gap-2 border border-gt-line bg-gt-paper p-4">
+      <div class="flex flex-col gap-2 rounded-[6px] border border-gt-ink bg-gt-paper p-4">
         <div class="h-2.5 w-2.5 {f.swatch}"></div>
         <h3 class="text-[13px] font-semibold">{f.title}</h3>
         <p class="text-[13px] leading-relaxed text-gt-ink-muted">{f.text}</p>

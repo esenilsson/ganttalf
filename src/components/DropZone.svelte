@@ -35,7 +35,7 @@
   <div
     role="button"
     tabindex="0"
-    class="flex w-full flex-col items-center justify-center gap-4 border-2 border-dashed bg-gt-paper p-10 text-center transition-colors duration-[120ms] ease-out {dragOver ? 'border-gt-brick-500 bg-gt-line-soft' : 'border-gt-ink-faint'}"
+    class="flex w-full flex-col items-center justify-center gap-4 rounded-[6px] border border-dashed bg-gt-paper p-10 text-center transition-colors duration-[120ms] ease-out {dragOver ? 'border-gt-brick-500 bg-gt-line-soft' : 'border-gt-ink-faint/50'}"
     ondragover={(e) => { e.preventDefault(); dragOver = true }}
     ondragleave={() => (dragOver = false)}
     ondrop={(e) => { e.preventDefault(); dragOver = false; handleFiles(e.dataTransfer.files) }}
