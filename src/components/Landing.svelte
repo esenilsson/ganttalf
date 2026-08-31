@@ -25,16 +25,33 @@
     },
   ]
 
-  // Static workspace preview in the 9b language: pastels carry category,
-  // ink carries the critical path, brick carries risk.
+  // Static workspace preview — monochrome ink, like the real plan canvas
   const mockWeeks = ['W27', 'W29', 'W31', 'W33', 'W35', 'W37']
   const mockRows = [
-    { name: 'Research interviews', swatch: 'var(--gt-cat-ice)', off: 6, w: 20, note: '6d' },
-    { name: 'Data model rewrite', swatch: 'var(--gt-cat-aqua)', off: 22, w: 26, note: '9d' },
-    { name: 'Timeline canvas', swatch: 'var(--gt-cat-lemon)', off: 40, w: 24, note: '8d' },
-    { name: 'Dependency engine', swatch: 'var(--gt-brick-500)', off: 58, w: 22, note: 'At risk' },
-    { name: 'Public beta', swatch: 'var(--gt-ink)', off: 80, milestone: true, note: 'Milestone', critical: true },
+    { name: 'Research interviews', off: 6, w: 20, note: '6d' },
+    { name: 'Data model rewrite', off: 22, w: 26, note: '9d' },
+    { name: 'Timeline canvas', off: 40, w: 24, note: '8d' },
+    { name: 'Dependency engine', off: 58, w: 22, note: 'At risk' },
+    { name: 'Public beta', off: 80, milestone: true, note: 'Milestone', critical: true },
   ]
+
+  // One-shot slide-in from the left once a row scrolls into view; never
+  // reverses on scroll-up. Motion is skipped for prefers-reduced-motion.
+  function reveal(node, delay = 0) {
+    node.style.transitionDelay = `${delay}ms`
+    node.classList.add('reveal-init')
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          node.classList.add('reveal-in')
+          io.disconnect()
+        }
+      },
+      { threshold: 0.5 },
+    )
+    io.observe(node)
+    return { destroy: () => io.disconnect() }
+  }
 </script>
 
 <div class="mx-auto flex w-full max-w-5xl flex-col items-center gap-10 pb-16 pt-6 sm:pt-12">
@@ -76,7 +93,7 @@
           <div
             class="flex h-11 items-center gap-2 truncate px-4 text-[13px] {r.critical ? 'font-semibold' : ''} {i < mockRows.length - 1 ? 'border-b border-gt-line-soft' : ''}"
           >
-            <span class="h-2.5 w-2.5 shrink-0" style="background: {r.swatch}"></span>{r.name}
+            <span class="h-2.5 w-2.5 shrink-0 bg-gt-ink" use:reveal={i * 90}></span>{r.name}
           </div>
         {/each}
       </div>
@@ -90,18 +107,18 @@
           <div class="flex h-11 items-center px-3 {i < mockRows.length - 1 ? 'border-b border-gt-line-soft' : ''}">
             <div style="width: {r.off}%"></div>
             {#if r.milestone}
-              <div class="h-0 w-0 border-b-[16px] border-l-[9px] border-r-[9px] border-b-gt-ink border-l-transparent border-r-transparent"></div>
+              <div class="h-0 w-0 border-b-[16px] border-l-[9px] border-r-[9px] border-b-gt-ink border-l-transparent border-r-transparent" use:reveal={i * 90}></div>
             {:else}
-              <div class="h-[18px]" style="width: {r.w}%; background: {r.swatch}"></div>
+              <div class="h-[18px] bg-gt-ink" style="width: {r.w}%" use:reveal={i * 90}></div>
             {/if}
-            <div class="ml-2 text-[11px] text-gt-ink-faint">{r.note}</div>
+            <div class="ml-2 text-[11px] text-gt-ink-faint" use:reveal={i * 90}>{r.note}</div>
           </div>
         {/each}
       </div>
     </div>
     </div>
     <figcaption class="px-1 pt-3 text-center text-[11px] text-gt-ink-muted">
-      Pastels carry category, ink carries the critical path, brick carries risk — three jobs, no overlap.
+      Ink on white — every bar, edge and milestone drags directly on the canvas.
     </figcaption>
   </figure>
 
@@ -123,3 +140,24 @@
     <a href="https://github.com/esenilsson/ganttalf" target="_blank" rel="noopener" class="font-semibold text-gt-ink underline underline-offset-2 hover:text-gt-brick-500">GitHub</a>.
   </p>
 </div>
+
+<style>
+  :global(.reveal-init) {
+    opacity: 0;
+    transform: translateX(-24px);
+    transition:
+      opacity 400ms ease-out,
+      transform 400ms ease-out;
+  }
+  :global(.reveal-in) {
+    opacity: 1;
+    transform: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.reveal-init) {
+      transition: none;
+      transform: none;
+      opacity: 1;
+    }
+  }
+</style>
