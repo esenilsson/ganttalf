@@ -6,8 +6,8 @@
   (e.g. `fancy-start-page`) and merge to `main` via a pull request.
 - `main` is the production branch — what lands there is what gets deployed.
   Branch pushes get Vercel preview deployments backed by the staging Supabase.
-- **File new feature ideas as GitHub issues** (`gh issue create`) instead of
-  keeping them in notes or TODOs, so they're tracked on the repo.
+- **File new feature ideas and bugs as GitHub issues** (`gh issue create`)
+  instead of keeping them in notes or TODOs, so they're tracked on the repo.
 
 ## Development
 
