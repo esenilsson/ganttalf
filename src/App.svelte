@@ -166,7 +166,20 @@
 
 <div class="mx-auto flex min-h-screen max-w-[1480px] flex-col gap-6 px-6 py-6">
   <header class="flex flex-wrap items-center gap-3">
-    <h1 class="text-2xl font-bold tracking-tight">🧙 Ganttalf</h1>
+    <h1 class="text-2xl font-bold tracking-tight">
+      <a
+        href="/"
+        class="transition-opacity hover:opacity-80"
+        onclick={(e) => {
+          // Shared view or modified click: real navigation, so the visitor's
+          // own autosave survives (in-SPA clear would wipe it)
+          if (e.metaKey || e.ctrlKey || store.readonly) return
+          e.preventDefault()
+          loadRows([], null)
+          history.replaceState(null, '', '/')
+        }}
+      >🧙 Ganttalf</a>
+    </h1>
     {#if hasRows && !store.readonly}
       <SaveMenu />
     {/if}
