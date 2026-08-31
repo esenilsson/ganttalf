@@ -11,7 +11,7 @@ Drop a spreadsheet · drag bars & milestones · export to PowerPoint, PNG, SVG �
 [![Tailwind CSS 4](https://img.shields.io/badge/Tailwind-4-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![Supabase](https://img.shields.io/badge/Supabase-auth%20%2B%20storage-3FCF8E?logo=supabase&logoColor=white)](https://supabase.com)
 
-<img src="src/assets/screenshot.png" alt="Ganttalf editing a sample project plan" width="900">
+<img src="docs/screenshot.png" alt="Ganttalf editing a sample project plan" width="900">
 
 </div>
 
