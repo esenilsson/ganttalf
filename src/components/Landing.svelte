@@ -109,7 +109,7 @@
 
   <div class="grid w-full gap-5 text-left sm:grid-cols-2 lg:grid-cols-4">
     {#each features as f (f.title)}
-      <div class="flex flex-col gap-2 rounded-xl border border-gt-ink bg-gt-paper p-5">
+      <div class="flex flex-col gap-2 rounded-xl bg-gt-paper p-5 shadow-sm">
         <div class="h-2.5 w-2.5 rounded-[2px] {f.swatch}"></div>
         <h3 class="font-display text-[22px] font-medium leading-tight">{f.title}</h3>
         <p class="text-[13px] leading-relaxed text-gt-ink-muted">{f.text}</p>
