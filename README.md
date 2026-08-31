@@ -75,3 +75,7 @@ variables. `vercel.json` rewrites all paths to `index.html` so `/c/<id>` and
 
 The `#g=` codec is shared with an external tool (`make-gantt.mjs` Claude skill).
 Do not refactor it — the encoder and decoder must stay byte-compatible.
+
+## 📄 License
+
+[MIT](LICENSE)
