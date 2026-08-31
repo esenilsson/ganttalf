@@ -164,12 +164,13 @@
 
 <svelte:window ondragover={onWindowDrop} ondrop={onWindowDrop} />
 
-<div class="mx-auto flex min-h-screen max-w-[1480px] flex-col gap-6 px-6 py-6">
-  <header class="flex flex-wrap items-center gap-3">
-    <h1 class="text-2xl font-bold tracking-tight">
+<div class="flex min-h-screen flex-col">
+  <header class="border-b border-gt-line bg-gt-rail">
+  <div class="mx-auto flex w-full max-w-[1480px] flex-wrap items-center gap-3 px-6 py-2.5">
+    <h1>
       <a
         href="/"
-        class="transition-opacity hover:opacity-80"
+        class="flex items-center gap-2.5 transition-opacity duration-[120ms] ease-out hover:opacity-80"
         onclick={(e) => {
           // Shared view or modified click: real navigation, so the visitor's
           // own autosave survives (in-SPA clear would wipe it)
@@ -178,16 +179,19 @@
           loadRows([], null)
           history.replaceState(null, '', '/')
         }}
-      >🧙 Ganttalf</a>
+      >
+        <span class="text-xl font-bold tracking-tight text-gt-ink">🧙 Ganttalf</span>
+      </a>
     </h1>
     {#if hasRows && !store.readonly}
+      <span class="h-[18px] w-px bg-gt-line"></span>
       <SaveMenu />
     {/if}
     <div class="mr-auto"></div>
     {#if hasRows}
       <div class="inline-flex overflow-hidden rounded-md border border-input" role="group" aria-label="Time scale">
-        <button class="h-9 px-3 text-sm font-medium transition-colors {store.scale === 'month' ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-accent'}" onclick={() => (store.scale = 'month')}>Month</button>
-        <button class="h-9 border-l border-input px-3 text-sm font-medium transition-colors {store.scale === 'week' ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-accent'}" onclick={() => (store.scale = 'week')}>Week</button>
+        <button class="h-9 px-3 text-sm font-medium transition-colors {store.scale === 'month' ? 'bg-primary text-primary-foreground' : 'bg-card hover:bg-accent'}" onclick={() => (store.scale = 'month')}>Month</button>
+        <button class="h-9 border-l border-input px-3 text-sm font-medium transition-colors {store.scale === 'week' ? 'bg-primary text-primary-foreground' : 'bg-card hover:bg-accent'}" onclick={() => (store.scale = 'week')}>Week</button>
       </div>
       {#if !store.readonly}
         <DropZone compact />
@@ -215,33 +219,35 @@
       rel="noopener"
       title="View on GitHub"
       aria-label="View on GitHub"
-      class="inline-flex h-9 w-9 items-center justify-center rounded-md transition-colors hover:bg-accent hover:text-accent-foreground"
+      class="inline-flex h-9 w-9 items-center justify-center rounded-md text-gt-ink-muted transition-colors hover:bg-accent hover:text-gt-ink"
     >
       <svg viewBox="0 0 16 16" class="h-5 w-5 fill-current" aria-hidden="true">
         <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
       </svg>
     </a>
     <UserMenu />
+  </div>
   </header>
 
+  <main class="mx-auto flex w-full max-w-[1480px] flex-1 flex-col gap-6 px-6 py-6">
   {#if hasRows}
     {#if store.readonly}
-      <div class="flex items-center justify-between gap-3 rounded-xl border border-border bg-muted/50 px-4 py-2.5">
-        <p class="text-sm text-muted-foreground">Viewing a shared chart — read-only. It always shows the owner's latest saved version.</p>
+      <div class="flex items-center justify-between gap-3 rounded-xl border border-gt-line bg-gt-rail px-4 py-2.5">
+        <p class="text-[13px] text-gt-ink-muted">Viewing a shared chart — read-only. It always shows the owner's latest saved version.</p>
         <Button variant="outline" size="sm" onclick={makeCopy}>Make a copy</Button>
       </div>
     {/if}
-    <section class="rounded-xl border border-border bg-card shadow-sm" class:pointer-events-none={store.readonly}>
+    <section class="overflow-hidden rounded-xl border border-gt-line bg-gt-paper shadow-sm" class:pointer-events-none={store.readonly}>
       <GanttChart bind:this={chart} />
     </section>
     {#if !store.readonly}
       <section class="flex flex-col gap-2">
-        <h2 class="text-sm font-medium text-muted-foreground">
-          Activities — edit here or drag bars/edges/milestones directly on the chart
+        <h2 class="text-[11px] font-extrabold uppercase tracking-[0.1em] text-gt-ink-faint">
+          Activities — edit here or drag bars/edges/milestones directly on the chart · Enter / ↑ ↓ jump between rows (⌥↑↓ in date fields)
         </h2>
         <RowTable />
       </section>
-      <footer class="pb-4 text-xs text-muted-foreground">
+      <footer class="pb-4 text-[11px] leading-relaxed text-gt-ink-muted">
         PowerPoint tips: <b>Export → PowerPoint</b> gives a .pptx where every bar and label is an
         editable native shape. <b>SVG</b> pastes crisply into slides (Insert → Pictures), and
         right-click → “Convert to Shape” makes it editable too. Keep the Excel file as the source of
@@ -250,14 +256,15 @@
     {/if}
   {:else}
     {#if hashError}
-      <p class="text-sm text-destructive">Couldn't read the chart data in this link — it may be truncated or from an incompatible version.</p>
+      <p class="text-[13px] text-gt-brick-500">Couldn't read the chart data in this link — it may be truncated or from an incompatible version.</p>
     {/if}
     {#if chartNotFound}
-      <p class="text-sm text-destructive">That saved chart doesn't exist anymore — it may have been deleted.</p>
+      <p class="text-[13px] text-gt-brick-500">That saved chart doesn't exist anymore — it may have been deleted.</p>
     {/if}
     {#if sharedNotFound}
-      <p class="text-sm text-destructive">This share link is no longer valid — sharing may have been turned off by the owner.</p>
+      <p class="text-[13px] text-gt-brick-500">This share link is no longer valid — sharing may have been turned off by the owner.</p>
     {/if}
     <Landing />
   {/if}
+  </main>
 </div>

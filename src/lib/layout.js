@@ -1,7 +1,7 @@
 import { makeTimescale } from './timescale.js'
 import { formatDMY, todayIso, isoToDays } from './dates.js'
 
-export const FONT = "'Inter', -apple-system, 'Segoe UI', system-ui, sans-serif"
+export const FONT = "'Archivo', -apple-system, 'Segoe UI', system-ui, sans-serif"
 
 const PAD = { left: 16, right: 16, top: 8 }
 const HEADER_H = 40
@@ -13,7 +13,7 @@ let _ctx = null
 function measure(text, px, bold = false) {
   if (typeof document !== 'undefined') {
     if (!_ctx) _ctx = document.createElement('canvas').getContext('2d')
-    _ctx.font = `${bold ? '600 ' : ''}${px}px Inter, sans-serif`
+    _ctx.font = `${bold ? '600 ' : ''}${px}px Archivo, sans-serif`
     return _ctx.measureText(text).width
   }
   return text.length * px * 0.55

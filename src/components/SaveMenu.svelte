@@ -101,20 +101,20 @@
 
 <div class="flex items-center">
   <input
-    class="h-9 w-44 rounded-l-md border border-input bg-background px-3 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+    class="h-9 w-44 rounded-l-[6px] border border-input bg-card px-3 text-sm shadow-sm transition-colors placeholder:text-gt-ink-faint focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
     placeholder="Untitled"
     bind:value={store.chartName}
     onkeydown={(e) => e.key === 'Enter' && save()}
   />
   <button
-    class="h-9 whitespace-nowrap border-y border-r border-input bg-background px-3 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground {saveState === 'error' ? 'text-destructive' : ''}"
+    class="h-9 whitespace-nowrap border-y border-r border-input bg-card px-3 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground {saveState === 'error' ? 'text-destructive' : ''}"
     onclick={() => save()}
   >
     {saveState === 'saved' ? 'Saved ✓' : saveState === 'copied' ? 'Saved a copy ✓' : saveState === 'error' ? 'Save failed' : 'Save'}
   </button>
   <div class="relative">
     <button
-      class="h-9 rounded-r-md border-y border-r border-input bg-background px-2 text-sm shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+      class="h-9 rounded-r-[6px] border-y border-r border-input bg-card px-2 text-sm shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
       aria-label="Saved charts"
       onclick={(e) => { e.stopPropagation(); toggleList() }}
     >▾</button>
@@ -130,7 +130,7 @@
             <div class="group flex items-center gap-1 rounded px-2 py-1.5 text-sm hover:bg-accent">
               {#if renamingId === c.id}
                 <input
-                  class="h-6 flex-1 rounded border border-input bg-background px-1 text-sm"
+                  class="h-6 flex-1 rounded border border-input bg-card px-1 text-sm"
                   bind:value={renameValue}
                   onkeydown={(e) => { if (e.key === 'Enter') commitRename(c); if (e.key === 'Escape') renamingId = null }}
                   onblur={() => commitRename(c)}
@@ -139,8 +139,8 @@
                 <button class="flex-1 truncate text-left" title={c.name} onclick={() => openChart(c.id)}>
                   {c.name}
                 </button>
-                <button class="hidden px-1 text-muted-foreground hover:text-foreground group-hover:block" title="Rename" onclick={() => { renamingId = c.id; renameValue = c.name }}>✎</button>
-                <button class="hidden px-1 text-muted-foreground hover:text-destructive group-hover:block" title="Delete" onclick={() => removeChart(c)}>✕</button>
+                <button class="hidden px-1 text-gt-ink-muted hover:text-gt-ink group-hover:block" title="Rename" onclick={() => { renamingId = c.id; renameValue = c.name }}>✎</button>
+                <button class="hidden px-1 text-gt-ink-muted hover:text-gt-brick-500 group-hover:block" title="Delete" onclick={() => removeChart(c)}>✕</button>
               {/if}
             </div>
           {/each}
