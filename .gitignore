@@ -5,3 +5,4 @@ public/template.xlsx
 .env.local
 .vercel
 .env*
+supabase/.temp/
