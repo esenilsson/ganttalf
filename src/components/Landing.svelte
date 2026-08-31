@@ -32,12 +32,12 @@
       Free · no account needed · open source
     </span>
     <h2 class="max-w-3xl text-balance text-4xl font-bold tracking-tight sm:text-6xl">
-      Beautiful Gantt charts,
-      <span class="bg-gradient-to-r from-indigo-500 via-sky-500 to-teal-500 bg-clip-text text-transparent">straight from Excel</span>
+      A project is never late,
+      <span class="bg-gradient-to-r from-indigo-500 via-sky-500 to-teal-500 bg-clip-text text-transparent">nor is it early</span>
     </h2>
     <p class="max-w-xl text-balance text-base text-muted-foreground sm:text-lg">
-      Drop a spreadsheet, drag bars and milestones into place, then export a
-      polished chart to PowerPoint, PNG, or SVG — or share it with a link.
+      It ships precisely when you plan it to. Drop a spreadsheet, drag bars and
+      milestones into place, then export to PowerPoint, PNG, or SVG.
     </p>
   </div>
 

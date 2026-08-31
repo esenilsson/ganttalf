@@ -3,3 +3,6 @@ dist
 public/template.xlsx
 .env
 .env.local
+.vercel
+.env*
+supabase/.temp/
