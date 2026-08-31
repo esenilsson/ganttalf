@@ -1,25 +1,52 @@
 @import 'tailwindcss';
 
-/* shadcn-style design tokens (slate base) */
+/* Ganttalf design language — Cloud Dancer ground, brick ramp, powdered pastels.
+   See the brand handoff: pastels carry category, ink carries the critical path,
+   brick carries risk and the one primary action per view. Nothing is rounded. */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
-  --radius: 0.5rem;
+  /* ground + ink */
+  --gt-ground: #f0efeb; /* Pantone 11-4201 Cloud Dancer — site chrome, empty states */
+  --gt-paper: #ffffff; /* the plan canvas — always plain white */
+  --gt-rail: #f8f7f5; /* app toolbars / footers */
+  --gt-ink: #2b2320;
+  --gt-ink-muted: #6b6058;
+  --gt-ink-faint: #9a948d;
+  --gt-line: #e6e4e1; /* structural hairline */
+  --gt-line-soft: #f0eeec; /* row hairline */
+
+  /* brick ramp — the only accent */
+  --gt-brick-100: #dda893;
+  --gt-brick-300: #c9705c;
+  --gt-brick-500: #b23a26; /* primary action, risk */
+  --gt-brick-600: #a2331f; /* primary hover */
+  --gt-brick-700: #7a2618; /* pressed */
+
+  /* Pantone Powdered Pastels — task categories only */
+  --gt-cat-lemon: #f6edbb; /* 11-0515 Lemon Icing */
+  --gt-cat-ice: #cfe0ef; /* 13-4306 Ice Melt */
+  --gt-cat-peach: #f3d9cc; /* 12-1107 Peach Dust */
+  --gt-cat-aqua: #c9d6c4; /* 13-6006 Almost Aqua */
+  --gt-cat-orchid: #d6d0de; /* 13-3802 Orchid Tint */
+  --gt-cat-nimbus: #d0d0d2; /* 13-4108 Nimbus Cloud */
+
+  /* shadcn-style names kept so existing utility classes resolve */
+  --background: var(--gt-ground);
+  --foreground: var(--gt-ink);
+  --card: var(--gt-paper);
+  --card-foreground: var(--gt-ink);
+  --primary: var(--gt-brick-500);
+  --primary-foreground: #ffffff;
+  --secondary: var(--gt-rail);
+  --secondary-foreground: var(--gt-ink);
+  --muted: var(--gt-rail);
+  --muted-foreground: var(--gt-ink-muted);
+  --accent: var(--gt-line-soft);
+  --accent-foreground: var(--gt-ink);
+  --destructive: var(--gt-brick-500);
+  --destructive-foreground: #ffffff;
+  --border: var(--gt-line);
+  --input: var(--gt-line);
+  --ring: var(--gt-brick-500);
 }
 
 @theme inline {
@@ -40,12 +67,50 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-sm: calc(var(--radius) - 4px);
+
+  --color-gt-ground: var(--gt-ground);
+  --color-gt-paper: var(--gt-paper);
+  --color-gt-rail: var(--gt-rail);
+  --color-gt-ink: var(--gt-ink);
+  --color-gt-ink-muted: var(--gt-ink-muted);
+  --color-gt-ink-faint: var(--gt-ink-faint);
+  --color-gt-line: var(--gt-line);
+  --color-gt-line-soft: var(--gt-line-soft);
+  --color-gt-brick-100: var(--gt-brick-100);
+  --color-gt-brick-300: var(--gt-brick-300);
+  --color-gt-brick-500: var(--gt-brick-500);
+  --color-gt-brick-600: var(--gt-brick-600);
+  --color-gt-brick-700: var(--gt-brick-700);
+  --color-gt-cat-lemon: var(--gt-cat-lemon);
+  --color-gt-cat-ice: var(--gt-cat-ice);
+  --color-gt-cat-peach: var(--gt-cat-peach);
+  --color-gt-cat-aqua: var(--gt-cat-aqua);
+  --color-gt-cat-orchid: var(--gt-cat-orchid);
+  --color-gt-cat-nimbus: var(--gt-cat-nimbus);
+
+  /* nothing is rounded */
+  --radius-xs: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+
+  --font-sans: 'Archivo', -apple-system, 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'EB Garamond', Georgia, serif;
 }
 
 body {
   @apply bg-background text-foreground antialiased;
-  font-family: 'Inter', -apple-system, 'Segoe UI', system-ui, sans-serif;
+  font-family: 'Archivo', -apple-system, 'Segoe UI', system-ui, sans-serif;
+}
+
+::selection {
+  background: rgba(178, 58, 38, 0.24);
+}
+
+:focus-visible {
+  outline: 2px solid var(--gt-brick-500);
+  outline-offset: 2px;
 }

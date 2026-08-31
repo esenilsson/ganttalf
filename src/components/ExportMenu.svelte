@@ -23,24 +23,24 @@
   <Button variant="outline" onclick={(e) => { e.stopPropagation(); open = !open }}>Export ▾</Button>
   {#if open}
     <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-    <div class="absolute right-0 top-10 z-20 w-52 rounded-md border border-border bg-card p-1 shadow-md" onclick={(e) => e.stopPropagation()}>
+    <div class="absolute right-0 top-10 z-20 w-52 border border-gt-ink bg-gt-paper p-1" onclick={(e) => e.stopPropagation()}>
       <!-- share entries stay open to show the copied feedback -->
       {#if showLive}
-        <button class="w-full rounded px-2 py-1.5 text-left text-sm hover:bg-accent" onclick={onsharelive}>
+        <button class="w-full px-2 py-1.5 text-left text-[13px] hover:bg-gt-line-soft" onclick={onsharelive}>
           {liveState === 'copied' ? 'Live link copied ✓' : liveState === 'error' ? 'Sharing failed' : 'Copy live link'}
         </button>
       {/if}
-      <button class="w-full rounded px-2 py-1.5 text-left text-sm hover:bg-accent" onclick={onshare}>
+      <button class="w-full px-2 py-1.5 text-left text-[13px] hover:bg-gt-line-soft" onclick={onshare}>
         {shareState === 'copied' ? 'Snapshot copied ✓' : shareState === 'ready' ? 'Link in address bar ✓' : 'Copy snapshot link'}
       </button>
       {#if showRevoke}
-        <button class="w-full rounded px-2 py-1.5 text-left text-sm text-muted-foreground hover:bg-accent" onclick={() => run(onstopsharing)}>
+        <button class="w-full px-2 py-1.5 text-left text-[13px] text-gt-ink-muted hover:bg-gt-line-soft" onclick={() => run(onstopsharing)}>
           Stop sharing
         </button>
       {/if}
-      <div class="my-1 border-t border-border"></div>
+      <div class="my-1 border-t border-gt-line"></div>
       {#each items as item (item.label)}
-        <button class="w-full rounded px-2 py-1.5 text-left text-sm hover:bg-accent" onclick={() => run(item.action)}>
+        <button class="w-full px-2 py-1.5 text-left text-[13px] hover:bg-gt-line-soft" onclick={() => run(item.action)}>
           {item.label}
         </button>
       {/each}

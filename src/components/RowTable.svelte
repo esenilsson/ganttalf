@@ -15,32 +15,32 @@
   ]
 </script>
 
-<div class="overflow-x-auto rounded-lg border border-border">
+<div class="overflow-x-auto border border-gt-line bg-gt-paper">
   <table class="w-full caption-bottom text-sm">
     <thead>
-      <tr class="border-b border-border bg-muted/50">
+      <tr class="border-b border-gt-line bg-gt-rail">
         {#each cols as c}
-          <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground {c.w}">{c.label}</th>
+          <th class="h-10 px-3 text-left align-middle text-[10px] font-extrabold uppercase tracking-[0.1em] text-gt-ink-faint {c.w}">{c.label}</th>
         {/each}
-        <th class="h-10 px-2 text-right font-medium text-muted-foreground">Row</th>
+        <th class="h-10 px-3 text-right align-middle text-[10px] font-extrabold uppercase tracking-[0.1em] text-gt-ink-faint">Row</th>
       </tr>
     </thead>
     <tbody>
       {#each store.rows as row, i (row.id)}
-        <tr class="border-b border-border transition-colors hover:bg-muted/30">
+        <tr class="border-b border-gt-line-soft transition-colors duration-[120ms] hover:bg-gt-rail">
           {#each cols as c}
             <td class="px-1 py-1 align-middle">
               {#if c.type === 'date'}
                 <input
                   type="date"
-                  class="h-8 w-full rounded-md border border-input bg-transparent px-2 text-sm tabular-nums focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  class="h-8 w-full border border-transparent bg-transparent px-2 text-[13px] tabular-nums transition-colors duration-[120ms] hover:border-gt-line"
                   value={row[c.key] ?? ''}
                   onchange={(e) => (row[c.key] = e.target.value || null)}
                 />
               {:else}
                 <input
                   type="text"
-                  class="h-8 w-full rounded-md border border-input bg-transparent px-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  class="h-8 w-full border border-transparent bg-transparent px-2 text-[13px] transition-colors duration-[120ms] hover:border-gt-line"
                   value={row[c.key]}
                   oninput={(e) => (row[c.key] = e.target.value)}
                 />
@@ -51,7 +51,7 @@
             <Button variant="ghost" size="icon" title="Move up" onclick={() => moveRow(i, -1)}>↑</Button>
             <Button variant="ghost" size="icon" title="Move down" onclick={() => moveRow(i, 1)}>↓</Button>
             <Button variant="ghost" size="icon" title="Insert row below" onclick={() => addRow(i)}>＋</Button>
-            <Button variant="ghost" size="icon" class="text-destructive" title="Delete row" onclick={() => deleteRow(i)}>✕</Button>
+            <Button variant="ghost" size="icon" class="text-gt-brick-500" title="Delete row" onclick={() => deleteRow(i)}>✕</Button>
           </td>
         </tr>
       {/each}

@@ -26,13 +26,13 @@ export async function exportPptx(layout, filename = 'ganttalf.pptx') {
   const text = (str, xPx, yPx, wPx, hPx, opts = {}) =>
     slide.addText(str, {
       x: X(xPx), y: Y(yPx), w: S(wPx), h: S(hPx),
-      fontFace: FONT_FACE, color: '111111', margin: 0,
+      fontFace: FONT_FACE, color: '2B2320', margin: 0,
       align: 'left', valign: 'middle', ...opts,
     })
   const line = (x1, y1, x2, y2, opts = {}) =>
     slide.addShape(pptx.ShapeType.line, {
       x: X(x1), y: Y(y1), w: S(x2 - x1), h: S(y2 - y1),
-      line: { color: '111111', width: 0.75, ...opts },
+      line: { color: '2B2320', width: 0.75, ...opts },
     })
 
   // Header labels
@@ -46,13 +46,13 @@ export async function exportPptx(layout, filename = 'ganttalf.pptx') {
   // Gridlines: dotted (weeks in month mode / days in week mode), solid week
   // boundaries + W## labels in week mode, month boundaries always solid
   for (const gx of dottedX) {
-    line(D.chartX + gx, D.bodyTop, D.chartX + gx, D.bodyBottom, { color: '999999', width: 0.5, dashType: 'sysDot' })
+    line(D.chartX + gx, D.bodyTop, D.chartX + gx, D.bodyBottom, { color: '9A948D', width: 0.5, dashType: 'sysDot' })
   }
   for (const w of solidWeeks) {
-    line(D.chartX + w.x, D.headerTop + 32, D.chartX + w.x, D.bodyBottom, { color: '777777', width: 0.6 })
+    line(D.chartX + w.x, D.headerTop + 32, D.chartX + w.x, D.bodyBottom, { color: '9A948D', width: 0.6 })
   }
   for (const w of weekLabels) {
-    text(w.label, D.chartX + w.x + 5, D.headerTop + 34, 60, 18, { fontSize: PT(12), color: '555555' })
+    text(w.label, D.chartX + w.x + 5, D.headerTop + 34, 60, 18, { fontSize: PT(12), color: '6B6058' })
   }
   for (const m of ts.months) {
     if (m.boundaryX != null) {
@@ -63,7 +63,7 @@ export async function exportPptx(layout, filename = 'ganttalf.pptx') {
   // Chart frame
   slide.addShape(pptx.ShapeType.rect, {
     x: X(D.chartX), y: Y(D.bodyTop), w: S(D.chartW), h: S(D.bodyBottom - D.bodyTop),
-    fill: { type: 'none' }, line: { color: '111111', width: 1 },
+    fill: { type: 'none' }, line: { color: '2B2320', width: 1 },
   })
 
   // Group breakers + labels
@@ -84,30 +84,30 @@ export async function exportPptx(layout, filename = 'ganttalf.pptx') {
       if (seg && seg.x1 - seg.x0 > 0) {
         slide.addShape(pptx.ShapeType.rect, {
           x: X(D.chartX + seg.x0), y: Y(it.barY), w: S(seg.x1 - seg.x0), h: S(it.barH),
-          fill: { type: 'none' }, line: { color: '555555', width: 1, dashType: 'dash' },
+          fill: { type: 'none' }, line: { color: '6B6058', width: 1, dashType: 'dash' },
         })
       }
     }
     if (it.solid && it.solid.x1 - it.solid.x0 > 0) {
       slide.addShape(pptx.ShapeType.rect, {
         x: X(D.chartX + it.solid.x0), y: Y(it.barY), w: S(it.solid.x1 - it.solid.x0), h: S(it.barH),
-        fill: { color: '111111' }, line: { type: 'none' },
+        fill: { color: '2B2320' }, line: { type: 'none' },
       })
     }
     if (it.milestoneX != null) {
       slide.addShape(pptx.ShapeType.triangle, {
         x: X(D.chartX + it.milestoneX - 7), y: Y(it.cy - 6), w: S(14), h: S(12),
-        fill: { color: '111111' }, line: { type: 'none' },
+        fill: { color: '2B2320' }, line: { type: 'none' },
       })
       if (it.milestoneLabelLeft) {
-        text(it.milestoneLabel, D.chartX + it.milestoneX - 101, it.y, 90, D.rowH, { fontSize: PT(11), color: '555555', align: 'right' })
+        text(it.milestoneLabel, D.chartX + it.milestoneX - 101, it.y, 90, D.rowH, { fontSize: PT(11), color: '6B6058', align: 'right' })
       } else {
-        text(it.milestoneLabel, D.chartX + it.milestoneX + 11, it.y, 90, D.rowH, { fontSize: PT(11), color: '555555' })
+        text(it.milestoneLabel, D.chartX + it.milestoneX + 11, it.y, 90, D.rowH, { fontSize: PT(11), color: '6B6058' })
       }
     }
     if (it.row.responsible && it.rightEdgeX != null) {
       const rx = it.rightEdgeX + (it.milestoneX != null ? 78 : 8)
-      text(it.row.responsible, D.chartX + rx, it.y, 110, D.rowH, { fontSize: PT(11), color: '888888' })
+      text(it.row.responsible, D.chartX + rx, it.y, 110, D.rowH, { fontSize: PT(11), color: '9A948D' })
     }
   }
 
@@ -118,7 +118,7 @@ export async function exportPptx(layout, filename = 'ganttalf.pptx') {
       x: X(Math.min(x1, x2)), y: Y(Math.min(y1, y2)),
       w: S(Math.abs(x2 - x1)), h: S(Math.abs(y2 - y1)),
       flipH: x2 < x1, flipV: y2 < y1,
-      line: { color: '666666', width: 1, ...opts },
+      line: { color: '6B6058', width: 1, ...opts },
     })
   for (const a of arrows) {
     for (let i = 0; i < a.pts.length - 1; i++) {
@@ -135,7 +135,7 @@ export async function exportPptx(layout, filename = 'ganttalf.pptx') {
     line(D.chartX + todayX, D.headerTop + 10, D.chartX + todayX, D.bodyBottom + 6, { width: 1.2, dashType: 'dash' })
     slide.addShape(pptx.ShapeType.triangle, {
       x: X(D.chartX + todayX - 8), y: Y(D.bodyBottom + 10), w: S(16), h: S(14),
-      fill: { color: '111111' }, line: { type: 'none' },
+      fill: { color: '2B2320' }, line: { type: 'none' },
     })
     text(todayLabel, D.chartX + todayX - 60, D.bodyBottom + 26, 120, 20, { fontSize: PT(14), align: 'center' })
   }
