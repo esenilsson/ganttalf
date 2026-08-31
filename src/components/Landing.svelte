@@ -1,5 +1,6 @@
 <script>
   import DropZone from './DropZone.svelte'
+  import ChartList from './ChartList.svelte'
 
   // Pastels carry category — one swatch per feature, same job as in the plan
   const features = [
@@ -72,6 +73,8 @@
   <div class="w-full max-w-2xl">
     <DropZone />
   </div>
+
+  <ChartList />
 
   <div class="h-px w-full bg-gt-ink"></div>
 
