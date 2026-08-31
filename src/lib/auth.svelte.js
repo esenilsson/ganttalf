@@ -13,9 +13,9 @@ export const authReady = new Promise((resolve) => {
   })
 })
 
-export function signIn() {
+export function signIn(provider = 'google') {
   return supabase.auth.signInWithOAuth({
-    provider: 'google',
+    provider,
     options: { redirectTo: location.origin + location.pathname },
   })
 }

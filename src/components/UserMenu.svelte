@@ -30,5 +30,13 @@
     {/if}
   </div>
 {:else if auth.ready}
-  <Button variant="ghost" size="sm" onclick={signIn}>Sign in</Button>
+  <div class="relative">
+    <Button variant="ghost" size="sm" onclick={(e) => { e.stopPropagation(); open = !open }}>Sign in</Button>
+    {#if open}
+      <div class="absolute right-0 top-10 z-20 w-48 rounded-md border border-border bg-card p-1 shadow-md">
+        <button class="w-full rounded px-2 py-1.5 text-left text-sm hover:bg-accent" onclick={() => signIn('google')}>Continue with Google</button>
+        <button class="w-full rounded px-2 py-1.5 text-left text-sm hover:bg-accent" onclick={() => signIn('github')}>Continue with GitHub</button>
+      </div>
+    {/if}
+  </div>
 {/if}
