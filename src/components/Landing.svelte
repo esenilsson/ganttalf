@@ -59,8 +59,8 @@
   <div class="h-px w-full bg-gt-ink"></div>
 
   <!-- Workspace preview — drawn in CSS, no bitmaps -->
-  <figure class="w-full rounded-xl border border-gt-ink bg-gt-paper p-3 sm:p-5" aria-label="The ganttalf workspace">
-    <div class="overflow-hidden rounded-lg border border-gt-line">
+  <figure class="w-full" aria-label="The ganttalf workspace">
+    <div class="overflow-hidden rounded-xl border border-gt-line bg-gt-paper shadow-sm">
     <div class="flex items-center justify-between gap-5 border-b border-gt-line bg-gt-rail px-4 py-2.5">
       <div class="flex items-center gap-3">
         <span class="text-[15px] font-bold tracking-tight">🧙 Ganttalf</span>
@@ -100,7 +100,7 @@
       </div>
     </div>
     </div>
-    <figcaption class="px-1 pt-3 text-[11px] text-gt-ink-muted">
+    <figcaption class="px-1 pt-3 text-center text-[11px] text-gt-ink-muted">
       Pastels carry category, ink carries the critical path, brick carries risk — three jobs, no overlap.
     </figcaption>
   </figure>
