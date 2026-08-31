@@ -15,7 +15,7 @@
   ]
 </script>
 
-<div class="overflow-x-auto border border-gt-line bg-gt-paper">
+<div class="overflow-x-auto rounded-xl border border-gt-line bg-gt-paper">
   <table class="w-full caption-bottom text-sm">
     <thead>
       <tr class="border-b border-gt-line bg-gt-rail">
@@ -33,14 +33,14 @@
               {#if c.type === 'date'}
                 <input
                   type="date"
-                  class="h-8 w-full border border-transparent bg-transparent px-2 text-[13px] tabular-nums transition-colors duration-[120ms] hover:border-gt-line"
+                  class="h-8 w-full rounded-md border border-input bg-transparent px-2 text-sm tabular-nums focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                   value={row[c.key] ?? ''}
                   onchange={(e) => (row[c.key] = e.target.value || null)}
                 />
               {:else}
                 <input
                   type="text"
-                  class="h-8 w-full border border-transparent bg-transparent px-2 text-[13px] transition-colors duration-[120ms] hover:border-gt-line"
+                  class="h-8 w-full rounded-md border border-input bg-transparent px-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                   value={row[c.key]}
                   oninput={(e) => (row[c.key] = e.target.value)}
                 />

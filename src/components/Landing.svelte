@@ -59,15 +59,15 @@
   <div class="h-px w-full bg-gt-ink"></div>
 
   <!-- Workspace preview — drawn in CSS, no bitmaps -->
-  <figure class="w-full rounded-[6px] border border-gt-ink bg-gt-paper p-3 sm:p-5" aria-label="The ganttalf workspace">
-    <div class="overflow-hidden rounded-[4px] border border-gt-line">
+  <figure class="w-full rounded-xl border border-gt-ink bg-gt-paper p-3 sm:p-5" aria-label="The ganttalf workspace">
+    <div class="overflow-hidden rounded-lg border border-gt-line">
     <div class="flex items-center justify-between gap-5 border-b border-gt-line bg-gt-rail px-4 py-2.5">
       <div class="flex items-center gap-3">
         <span class="text-[15px] font-bold tracking-tight">🧙 Ganttalf</span>
         <span class="h-[18px] w-px bg-gt-line"></span>
         <span class="text-[13px] text-gt-ink-muted">Q3 roadmap</span>
       </div>
-      <span class="bg-gt-brick-500 px-3 py-2 text-[10px] font-extrabold uppercase tracking-[0.1em] text-white">Add task</span>
+      <span class="rounded-md bg-gt-brick-500 px-3 py-1.5 text-xs font-medium text-white">Add task</span>
     </div>
     <div class="grid grid-cols-[minmax(150px,240px)_1fr]">
       <div class="border-r border-gt-line">
@@ -109,7 +109,7 @@
 
   <div class="grid w-full gap-5 text-left sm:grid-cols-2 lg:grid-cols-4">
     {#each features as f (f.title)}
-      <div class="flex flex-col gap-2 rounded-[6px] border border-gt-ink bg-gt-paper p-4">
+      <div class="flex flex-col gap-2 rounded-xl border border-gt-ink bg-gt-paper p-4">
         <div class="h-2.5 w-2.5 {f.swatch}"></div>
         <h3 class="text-[13px] font-semibold">{f.title}</h3>
         <p class="text-[13px] leading-relaxed text-gt-ink-muted">{f.text}</p>

@@ -25,7 +25,7 @@
 {#if auth.user}
   <div class="relative">
     <button
-      class="flex h-8 w-8 items-center justify-center overflow-hidden border border-gt-line bg-gt-paper text-sm font-medium text-gt-ink transition-colors duration-[120ms] ease-out hover:border-gt-ink"
+      class="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-secondary text-sm font-medium text-secondary-foreground hover:ring-1 hover:ring-ring"
       title={name}
       onclick={(e) => { e.stopPropagation(); open = !open }}
     >
@@ -36,9 +36,9 @@
       {/if}
     </button>
     {#if open}
-      <div class="absolute right-0 top-10 z-20 w-44 border border-gt-ink bg-gt-paper p-1">
-        <p class="truncate px-2 py-1.5 text-[11px] text-gt-ink-muted">{name}</p>
-        <button class="block w-full px-2 py-1.5 text-left text-[13px] hover:bg-gt-line-soft" onclick={handleSignOut}>Sign out</button>
+      <div class="absolute right-0 top-10 z-20 w-44 rounded-md border border-border bg-card p-1 shadow-md">
+        <p class="truncate px-2 py-1.5 text-xs text-muted-foreground">{name}</p>
+        <button class="block w-full rounded px-2 py-1.5 text-left text-sm hover:bg-accent" onclick={handleSignOut}>Sign out</button>
       </div>
     {/if}
   </div>
@@ -46,9 +46,9 @@
   <div class="relative">
     <Button variant="ghost" size="sm" onclick={(e) => { e.stopPropagation(); open = !open }}>Sign in</Button>
     {#if open}
-      <div class="absolute right-0 top-10 z-20 w-48 border border-gt-ink bg-gt-paper p-1">
-        <button class="w-full px-2 py-1.5 text-left text-[13px] hover:bg-gt-line-soft" onclick={() => signIn('google')}>Continue with Google</button>
-        <button class="w-full px-2 py-1.5 text-left text-[13px] hover:bg-gt-line-soft" onclick={() => signIn('github')}>Continue with GitHub</button>
+      <div class="absolute right-0 top-10 z-20 w-48 rounded-md border border-border bg-card p-1 shadow-md">
+        <button class="w-full rounded px-2 py-1.5 text-left text-sm hover:bg-accent" onclick={() => signIn('google')}>Continue with Google</button>
+        <button class="w-full rounded px-2 py-1.5 text-left text-sm hover:bg-accent" onclick={() => signIn('github')}>Continue with GitHub</button>
       </div>
     {/if}
   </div>

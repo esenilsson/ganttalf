@@ -47,6 +47,7 @@
   --border: var(--gt-line);
   --input: var(--gt-line);
   --ring: var(--gt-brick-500);
+  --radius: 0.75rem;
 }
 
 @theme inline {
@@ -88,14 +89,9 @@
   --color-gt-cat-orchid: var(--gt-cat-orchid);
   --color-gt-cat-nimbus: var(--gt-cat-nimbus);
 
-  /* nothing is rounded */
-  --radius-xs: 0px;
-  --radius-sm: 0px;
-  --radius-md: 0px;
-  --radius-lg: 0px;
-  --radius-xl: 0px;
-  --radius-2xl: 0px;
-  --radius-3xl: 0px;
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
 
   --font-sans: 'Archivo', -apple-system, 'Segoe UI', system-ui, sans-serif;
   --font-display: 'EB Garamond', Georgia, serif;
@@ -108,9 +104,4 @@ body {
 
 ::selection {
   background: rgba(178, 58, 38, 0.24);
-}
-
-:focus-visible {
-  outline: 2px solid var(--gt-brick-500);
-  outline-offset: 2px;
 }

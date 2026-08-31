@@ -101,36 +101,36 @@
 
 <div class="flex items-center">
   <input
-    class="h-9 w-44 border border-gt-line bg-gt-paper px-3 text-[13px] transition-colors duration-[120ms] ease-out placeholder:text-gt-ink-faint"
+    class="h-9 w-44 rounded-l-md border border-input bg-card px-3 text-sm shadow-sm transition-colors placeholder:text-gt-ink-faint focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
     placeholder="Untitled"
     bind:value={store.chartName}
     onkeydown={(e) => e.key === 'Enter' && save()}
   />
   <button
-    class="h-9 whitespace-nowrap border-y border-r border-gt-line bg-gt-paper px-3 text-[10px] font-extrabold uppercase tracking-[0.1em] transition-colors duration-[120ms] ease-out hover:bg-gt-line-soft {saveState === 'error' ? 'text-gt-brick-500' : ''}"
+    class="h-9 whitespace-nowrap border-y border-r border-input bg-card px-3 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground {saveState === 'error' ? 'text-destructive' : ''}"
     onclick={() => save()}
   >
     {saveState === 'saved' ? 'Saved ✓' : saveState === 'copied' ? 'Saved a copy ✓' : saveState === 'error' ? 'Save failed' : 'Save'}
   </button>
   <div class="relative">
     <button
-      class="h-9 border-y border-r border-gt-line bg-gt-paper px-2 text-sm transition-colors duration-[120ms] ease-out hover:bg-gt-line-soft"
+      class="h-9 rounded-r-md border-y border-r border-input bg-card px-2 text-sm shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
       aria-label="Saved charts"
       onclick={(e) => { e.stopPropagation(); toggleList() }}
     >▾</button>
     {#if open}
       <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-      <div class="absolute left-0 top-10 z-20 w-72 border border-gt-ink bg-gt-paper p-1" onclick={(e) => e.stopPropagation()}>
+      <div class="absolute left-0 top-10 z-20 w-72 rounded-md border border-border bg-card p-1 shadow-md" onclick={(e) => e.stopPropagation()}>
         {#if charts === null}
-          <p class="px-2 py-1.5 text-[13px] text-gt-ink-muted">Loading…</p>
+          <p class="px-2 py-1.5 text-sm text-muted-foreground">Loading…</p>
         {:else if charts.length === 0}
-          <p class="px-2 py-1.5 text-[13px] text-gt-ink-muted">No saved charts yet</p>
+          <p class="px-2 py-1.5 text-sm text-muted-foreground">No saved charts yet</p>
         {:else}
           {#each charts as c (c.id)}
-            <div class="group flex items-center gap-1 px-2 py-1.5 text-[13px] hover:bg-gt-line-soft">
+            <div class="group flex items-center gap-1 rounded px-2 py-1.5 text-sm hover:bg-accent">
               {#if renamingId === c.id}
                 <input
-                  class="h-6 flex-1 border border-gt-line bg-gt-paper px-1 text-[13px]"
+                  class="h-6 flex-1 rounded border border-input bg-card px-1 text-sm"
                   bind:value={renameValue}
                   onkeydown={(e) => { if (e.key === 'Enter') commitRename(c); if (e.key === 'Escape') renamingId = null }}
                   onblur={() => commitRename(c)}
@@ -146,8 +146,8 @@
           {/each}
         {/if}
         {#if store.chartId}
-          <div class="mt-1 border-t border-gt-line pt-1">
-            <button class="w-full px-2 py-1.5 text-left text-[13px] hover:bg-gt-line-soft" onclick={() => { open = false; save(true) }}>Save as new</button>
+          <div class="mt-1 border-t border-border pt-1">
+            <button class="w-full rounded px-2 py-1.5 text-left text-sm hover:bg-accent" onclick={() => { open = false; save(true) }}>Save as new</button>
           </div>
         {/if}
       </div>
