@@ -1,10 +1,23 @@
 <script>
   import { auth, signIn, signOut } from '../lib/auth.svelte.js'
+  import { store, loadRows } from '../lib/stores.svelte.js'
   import Button from './ui/Button.svelte'
 
   let open = $state(false)
   const name = $derived(auth.user?.user_metadata?.full_name || auth.user?.email)
   const picture = $derived(auth.user?.user_metadata?.avatar_url)
+
+  async function handleSignOut() {
+    await signOut()
+    // Back to the start page — same rules as clicking the logo: real
+    // navigation from a shared view so the visitor's autosave survives
+    if (store.readonly) {
+      location.href = '/'
+      return
+    }
+    loadRows([], null)
+    history.replaceState(null, '', '/')
+  }
 </script>
 
 <svelte:window onclick={() => (open = false)} />
@@ -25,7 +38,7 @@
     {#if open}
       <div class="absolute right-0 top-10 z-20 w-44 rounded-md border border-border bg-card p-1 shadow-md">
         <p class="truncate px-2 py-1.5 text-xs text-muted-foreground">{name}</p>
-        <button class="block w-full rounded px-2 py-1.5 text-left text-sm hover:bg-accent" onclick={signOut}>Sign out</button>
+        <button class="block w-full rounded px-2 py-1.5 text-left text-sm hover:bg-accent" onclick={handleSignOut}>Sign out</button>
       </div>
     {/if}
   </div>

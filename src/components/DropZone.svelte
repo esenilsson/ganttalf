@@ -35,22 +35,20 @@
   <div
     role="button"
     tabindex="0"
-    class="flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed p-16 text-center transition-colors {dragOver ? 'border-ring bg-accent' : 'border-border'}"
+    class="flex w-full flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed bg-card p-10 text-center transition-colors {dragOver ? 'border-ring bg-accent' : 'border-border'}"
     ondragover={(e) => { e.preventDefault(); dragOver = true }}
     ondragleave={() => (dragOver = false)}
     ondrop={(e) => { e.preventDefault(); dragOver = false; handleFiles(e.dataTransfer.files) }}
     onclick={() => fileInput.click()}
     onkeydown={(e) => e.key === 'Enter' && fileInput.click()}
   >
-    <div class="text-5xl">🧙</div>
     <div class="text-lg font-medium">Drop an Excel file here, or click to browse</div>
     <p class="max-w-lg text-sm text-muted-foreground">
-      Columns: <b>Activity</b> (required), Group, Tentative Start, Start, End, Tentative End,
-      Milestone, Responsible, Depends On. A row with only a Milestone date renders as a ▲ marker;
-      Depends On (an activity name or row number) draws a dependency arrow.
+      Columns: <b>Activity</b> (required), plus optional Group, Start, End, Tentative Start/End,
+      Milestone, Responsible, Depends On — or start from the template.
     </p>
     <div class="flex gap-3" role="none" onclick={(e) => e.stopPropagation()}>
-      <Button variant="secondary" onclick={() => loadRows(sampleRows(), 'sample')}>Load sample</Button>
+      <Button variant="default" onclick={() => loadRows(sampleRows(), 'sample')}>Try the sample</Button>
       <Button variant="outline" onclick={() => { const a = document.createElement('a'); a.href = 'template.xlsx'; a.download = 'ganttalf-template.xlsx'; a.click() }}>Download template</Button>
     </div>
     {#if error}
