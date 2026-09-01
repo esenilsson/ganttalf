@@ -1,22 +1,22 @@
 import { newId } from './excel.js'
 
-// Runner tournament preparation — race day 2026-11-28.
+// The quest of the Ring — from Bag End to Mount Doom, autumn 2026.
 const raw = [
-  ['Planning', 'Define tournament concept & budget', null, '2026-09-01', '2026-09-11', null, null, 'Emil'],
-  ['Planning', 'Secure venue & course permits', null, '2026-09-07', '2026-09-25', '2026-10-02', null, 'Anna'],
-  ['Planning', 'Permits approved', null, null, null, null, '2026-10-02', ''],
-  ['Registration', 'Open registration & payment setup', null, '2026-09-21', '2026-10-02', null, null, 'Johan'],
-  ['Registration', 'Registration window', null, '2026-10-05', '2026-11-13', null, null, 'Johan', 'Open registration & payment setup'],
-  ['Registration', 'Seeding & start groups', null, '2026-11-16', '2026-11-20', null, null, 'Johan', 'Registration window'],
-  ['Marketing', 'Sponsor outreach', '2026-09-07', '2026-09-14', '2026-10-16', null, null, 'Sara'],
-  ['Marketing', 'Campaign & social media push', null, '2026-10-05', '2026-11-20', null, null, 'Sara'],
-  ['Marketing', 'Sponsor package signed', null, null, null, null, '2026-10-16', ''],
-  ['Logistics', 'Course marking & timing system', null, '2026-11-02', '2026-11-20', null, null, 'Anna'],
-  ['Logistics', 'Volunteer recruitment & briefing', null, '2026-10-19', '2026-11-25', null, null, 'Emil'],
-  ['Logistics', 'Medals, bibs & goodie bags', null, '2026-10-26', '2026-11-18', '2026-11-24', null, 'Sara'],
-  ['Race week', 'Course rehearsal & dry run', null, '2026-11-23', '2026-11-26', null, null, 'Anna', 'Course marking & timing system'],
-  ['Race week', 'Race day', null, null, null, null, '2026-11-28', '', 'Course rehearsal & dry run'],
-  ['Race week', 'Results, prizes & wrap-up', null, '2026-11-28', '2026-12-04', null, null, 'Emil'],
+  ['The Shire', 'Keep the Ring secret & pack', null, '2026-09-01', '2026-09-18', null, null, 'Frodo'],
+  ['The Shire', 'Research the Ring in the archives', '2026-09-04', '2026-09-08', '2026-09-21', null, null, 'Gandalf'],
+  ['The Shire', 'Departure from Bag End', null, null, null, null, '2026-09-22', ''],
+  ['The Road East', 'Cross the Old Forest to Bree', null, '2026-09-22', '2026-10-02', null, null, 'Merry', 'Departure from Bag End'],
+  ['The Road East', 'Meet Strider at the Prancing Pony', null, null, null, null, '2026-10-02', ''],
+  ['The Road East', 'Flight to the Ford of Rivendell', null, '2026-10-03', '2026-10-20', null, null, 'Aragorn', 'Cross the Old Forest to Bree'],
+  ['Rivendell', 'Recovery & Council of Elrond', null, '2026-10-21', '2026-10-30', null, null, 'Elrond'],
+  ['Rivendell', 'The Fellowship is formed', null, null, null, null, '2026-10-30', ''],
+  ['Rivendell', 'Provisioning & route planning', null, '2026-10-31', '2026-11-10', null, null, 'Sam'],
+  ['Misty Mountains', 'Attempt the Caradhras pass', null, '2026-11-11', '2026-11-16', null, null, 'Gandalf'],
+  ['Misty Mountains', 'Through the Mines of Moria', null, '2026-11-17', '2026-11-24', '2026-11-28', null, 'Gimli', 'Attempt the Caradhras pass'],
+  ['Misty Mountains', 'Rest & gifts in Lothlórien', null, '2026-11-28', '2026-12-04', null, null, 'Galadriel'],
+  ['Mordor', 'Down the Anduin, Fellowship breaks', null, '2026-12-04', '2026-12-10', null, null, 'Boromir'],
+  ['Mordor', 'The secret stair via Cirith Ungol', '2026-12-08', '2026-12-11', '2026-12-20', null, null, 'Gollum'],
+  ['Mordor', 'The Ring goes into the fire', null, null, null, null, '2026-12-25', '', 'The secret stair via Cirith Ungol'],
 ]
 
 export function sampleRows() {
