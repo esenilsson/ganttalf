@@ -29,11 +29,11 @@
   // Static workspace preview — monochrome ink, like the real plan canvas
   const mockWeeks = ['W27', 'W29', 'W31', 'W33', 'W35', 'W37']
   const mockRows = [
-    { name: 'Research interviews', off: 6, w: 20, note: '6d' },
-    { name: 'Data model rewrite', off: 22, w: 26, note: '9d' },
-    { name: 'Timeline canvas', off: 40, w: 24, note: '8d' },
-    { name: 'Dependency engine', off: 58, w: 22, note: 'At risk' },
-    { name: 'Public beta', off: 80, milestone: true, note: 'Milestone', critical: true },
+    { name: 'Leave the Shire', off: 6, w: 20, note: '6d' },
+    { name: 'Road to Rivendell', off: 22, w: 26, note: '9d' },
+    { name: 'Mines of Moria', off: 40, w: 24, note: '8d' },
+    { name: 'Pass of Cirith Ungol', off: 58, w: 22, note: 'At risk' },
+    { name: 'Mount Doom', off: 80, milestone: true, note: 'Milestone', critical: true },
   ]
 
   // One-shot slide-in from the left once a row scrolls into view; never
