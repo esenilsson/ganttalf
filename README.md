@@ -115,6 +115,19 @@ npm install --prefix ~/.claude/skills/ganttalf   # optional, only for .xlsx outp
 Without the `npm install` step the skill still produces share links; only the
 spreadsheet is skipped, and it tells you so.
 
+### Install it in the Claude app
+
+The Claude desktop and web apps take skills as a zip. Build one:
+
+```sh
+./scripts/make-skill-zip.sh          # writes ganttalf-skill.zip
+```
+
+Then in Claude, go to **Customize → Skills → Add → Upload a skill** and pick the zip.
+Code execution must be enabled under Settings → Capabilities, since the skill runs a
+bundled Node script. The zip holds the skill folder as its root entry and leaves
+`node_modules` out, which is what the uploader expects.
+
 ## ⚠️ Note on `src/lib/share.js`
 
 The `#g=` codec is shared with the skill's `make-gantt.mjs` encoder.

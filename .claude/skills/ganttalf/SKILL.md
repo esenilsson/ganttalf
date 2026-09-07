@@ -1,6 +1,6 @@
 ---
 name: ganttalf
-description: Create or adjust a Gantt chart with Ganttalf, a thinkcell-style Gantt chart maker. Use when the user asks for a gantt chart, project plan, project timeline, or roadmap with dated activities, or when they refer to an existing chart (a share link or .xlsx) and want it changed — it produces an .xlsx plus a share link that opens the chart pre-loaded in the app.
+description: Create or adjust a Gantt chart, project plan, timeline or roadmap with dated activities. Writes an .xlsx plus a link that opens the chart ready to edit, and reads existing charts back.
 ---
 
 # Ganttalf — generate a Gantt chart
