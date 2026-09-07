@@ -1,0 +1,68 @@
+name: Skill
+
+# The #g= codec is implemented twice — src/lib/share.js in the app and
+# make-gantt.mjs in the skill — so every change to either is checked for drift.
+# Tagging skill-v* additionally publishes the archive the Claude app uploads.
+
+on:
+  push:
+    branches: [main]
+    tags: ['skill-v*']
+  pull_request:
+
+concurrency:
+  group: skill-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate skill
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # The app-side decoder pulls in xlsx, so the round-trip checks need
+      # the root dependencies, not just the skill's own.
+      - run: npm ci
+
+      - run: npm run check:skill
+
+  release:
+    name: Publish skill archive
+    needs: validate
+    if: startsWith(github.ref, 'refs/tags/skill-v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the upload archive
+        run: ./scripts/make-skill-zip.sh "$GITHUB_WORKSPACE/ganttalf-skill.zip"
+
+      # Not marked latest: these tags version the skill, not the app.
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" ganttalf-skill.zip \
+            --title "Ganttalf skill $GITHUB_REF_NAME" \
+            --latest=false \
+            --notes 'Claude skill package for Ganttalf.
+
+          **Claude app** — download `ganttalf-skill.zip`, then go to Customize → Skills → Add → Upload a skill. Code execution must be enabled under Settings → Capabilities.
+
+          **Claude Code** — no download needed:
+
+          ```
+          /plugin marketplace add esenilsson/ganttalf
+          /plugin install ganttalf@ganttalf
+          ```'

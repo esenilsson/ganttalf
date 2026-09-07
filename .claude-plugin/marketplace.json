@@ -1,0 +1,18 @@
+{
+  "name": "ganttalf",
+  "owner": {
+    "name": "Emil Nilsson",
+    "url": "https://github.com/esenilsson"
+  },
+  "description": "The Ganttalf Gantt chart skill for Claude Code.",
+  "plugins": [
+    {
+      "name": "ganttalf",
+      "source": ".",
+      "description": "Turn a described project plan into a Gantt chart. Writes a re-importable .xlsx and a share link that opens the chart pre-loaded at ganttalf.app, and reads existing charts back so they can be adjusted.",
+      "homepage": "https://ganttalf.app",
+      "keywords": ["gantt", "project-plan", "timeline", "roadmap", "excel"],
+      "skills": ["./.claude/skills/ganttalf"]
+    }
+  ]
+}

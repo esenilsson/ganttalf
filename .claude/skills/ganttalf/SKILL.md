@@ -1,6 +1,6 @@
 ---
 name: ganttalf
-description: Create or adjust a Gantt chart with Ganttalf, a thinkcell-style Gantt chart maker. Use when the user asks for a gantt chart, project plan, project timeline, or roadmap with dated activities, or when they refer to an existing chart (a share link or .xlsx) and want it changed — it produces an .xlsx plus a share link that opens the chart pre-loaded in the app.
+description: Create or adjust a Gantt chart, project plan, timeline or roadmap with dated activities. Writes an .xlsx plus a link that opens the chart ready to edit, and reads existing charts back.
 ---
 
 # Ganttalf — generate a Gantt chart
@@ -77,11 +77,15 @@ The script says as much if it is handed one.
 - The `#g=` codec must stay byte-compatible with `src/lib/share.js`, and the spreadsheet header handling with `src/lib/excel.js`. Change both or neither.
 - Sign-in is **not** required for anything this skill produces. Snapshot links and `.xlsx` files work anonymously; an account is only needed to save charts server-side or mint a live `/s/` link.
 
-## Installing outside this repo
+## Installing
 
-Claude Code picks the skill up automatically when working inside this repo. To make it
-available everywhere, symlink or copy it into your personal skills directory:
+Claude Code picks the skill up automatically inside this repo. To install it anywhere
+else — no local Ganttalf needed, it targets the hosted app:
 
-```sh
-ln -s "$PWD/.claude/skills/ganttalf" ~/.claude/skills/ganttalf
 ```
+/plugin marketplace add esenilsson/ganttalf
+/plugin install ganttalf@ganttalf
+```
+
+Dependencies are fetched as part of that. If `xlsx` is ever missing the script still
+prints the share link and names the one command that fixes the spreadsheet output.
