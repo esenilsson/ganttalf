@@ -60,14 +60,20 @@ node <skill-dir>/make-gantt.mjs rows.json <name>.xlsx
 
 - a **snapshot link** (`https://ganttalf.app/#g=…`) or the bare `#g=` token — decoded
   offline, no account or network needed
+- a **live share link** (`https://ganttalf.app/s/<token>`) — fetched through the app's
+  public share lookup, which needs no account
 - an **.xlsx** exported from the app, or any spreadsheet with an `Activity` column
 
 Omit the output path to print the rows to stdout instead.
 
-**Saved-chart and live-share links cannot be read.** A `/c/<id>` or `/s/<token>` URL
-points at a row in the database behind the owner's sign-in, so there is nothing to
-decode locally. Ask the user to open it and use *Export → Excel*, then read that file.
-The script says as much if it is handed one.
+**A saved-chart link (`/c/<id>`) cannot be read.** It points at a row behind the
+owner's sign-in, and the skill has no account. Ask for one of these instead:
+
+- *Export → Share live link*, then the `/s/…` link — read directly, and it always
+  reflects the owner's latest save
+- *Export → Excel*, then the `.xlsx`
+
+The script prints exactly that if it is handed a `/c/` link.
 
 ## Notes
 
