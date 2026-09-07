@@ -71,9 +71,35 @@ Framework preset **Vite**, build `npm run build`, output `dist`. Set
 variables. `vercel.json` rewrites all paths to `index.html` so `/c/<id>` and
 `/s/<token>` deep links work.
 
+## 🤖 Claude skill
+
+`.claude/skills/ganttalf/` is a [Claude Code](https://claude.com/claude-code) skill that
+turns a described project plan into a chart: it writes a re-importable `.xlsx` and prints
+a snapshot link that opens the chart pre-loaded. It reads charts back too, so you can hand
+Claude an existing link or spreadsheet and ask for changes. Ask for "a gantt chart for ..."
+while working in this repo and it picks the skill up automatically.
+
+```sh
+cd .claude/skills/ganttalf && npm install
+
+node make-gantt.mjs rows.json plan.xlsx        # write .xlsx + snapshot link
+node make-gantt.mjs --read <link|xlsx> rows.json   # read one back to JSON
+
+export GANTTALF_URL=http://localhost:5173      # defaults to https://ganttalf.app
+```
+
+`--read` decodes `#g=` snapshot links and `.xlsx` files offline. Saved-chart (`/c/`) and
+live-share (`/s/`) links live in the database, so export those to Excel first.
+
+To use it outside this repo, symlink it into your personal skills directory:
+
+```sh
+ln -s "$PWD/.claude/skills/ganttalf" ~/.claude/skills/ganttalf
+```
+
 ## ⚠️ Note on `src/lib/share.js`
 
-The `#g=` codec is shared with an external tool (`make-gantt.mjs` Claude skill).
+The `#g=` codec is shared with the skill's `make-gantt.mjs` encoder.
 Do not refactor it — the encoder and decoder must stay byte-compatible.
 
 ## 📄 License
