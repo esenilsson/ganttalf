@@ -4,7 +4,8 @@
 //   node make-gantt.mjs rows.json out.xlsx     write a chart (.xlsx + share URL)
 //   node make-gantt.mjs --read <source>        read an existing chart back to rows JSON
 //
-// <source> is a share link ('…/#g=…'), a bare #g= token, or a path to an .xlsx.
+// <source> is a snapshot link ('…/#g=…'), a live share link ('…/s/<token>'), a
+// bare #g= token, or a path to an .xlsx.
 // Override the share link's host with GANTTALF_URL.
 //
 // The URL encoding (compact arrays → JSON → deflate-raw → base64url) and the
@@ -12,6 +13,8 @@
 // and src/lib/excel.js in this repo.
 import { deflateRawSync, inflateRawSync } from 'node:zlib'
 import { readFileSync, writeFileSync, existsSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 
 // Where the generated share link points. Override with the GANTTALF_URL env var
 // to target another deployment, e.g. GANTTALF_URL=http://localhost:5173
@@ -25,10 +28,14 @@ const ISO = /^\d{4}-\d{2}-\d{2}$/
 
 const usage = `Usage:
   node make-gantt.mjs rows.json out.xlsx     write a chart
-  node make-gantt.mjs --read <source> [rows.json]   read a share link or .xlsx back to rows
+  node make-gantt.mjs --read <source> [rows.json]   read a link or .xlsx back to rows
+
+Sources for --read: a /s/<token> share link, a #g=… snapshot link, or an .xlsx.
 
 Env:
-  GANTTALF_URL   base URL for the share link (default ${BASE_URL})`
+  GANTTALF_URL                  base URL for generated links (default ${BASE_URL})
+  GANTTALF_SUPABASE_URL         override the project discovered from the app
+  GANTTALF_SUPABASE_ANON_KEY    override the public key discovered from the app`
 
 const fail = (msg) => {
   console.error(msg)
@@ -136,6 +143,70 @@ const readWorkbook = async (path) => {
   return rows
 }
 
+// --- live share links ('/s/<token>') ---------------------------------------
+// Reading one needs the app's Supabase project URL and anon key. Both are public
+// by design — they ship in the browser bundle, and row-level security is the real
+// boundary — so they are discovered from the deployment rather than committed
+// here, which also survives a key rotation. Override via env when self-hosting.
+//
+// get_shared_chart is the only anonymous read path: a security-definer function
+// granted to 'anon', matching an exact random token. It cannot list or reach
+// anything the owner has not chosen to share.
+const CONFIG_TTL_MS = 24 * 60 * 60 * 1000
+
+const discoverConfig = async (baseUrl) => {
+  const env = { url: process.env.GANTTALF_SUPABASE_URL, key: process.env.GANTTALF_SUPABASE_ANON_KEY }
+  if (env.url && env.key) return env
+
+  const cacheFile = join(tmpdir(), `ganttalf-config-${Buffer.from(baseUrl).toString('hex').slice(0, 24)}.json`)
+  try {
+    const cached = JSON.parse(readFileSync(cacheFile, 'utf8'))
+    if (Date.now() - cached.at < CONFIG_TTL_MS && cached.url && cached.key) return cached
+  } catch {
+    // no usable cache; fall through and discover
+  }
+
+  const page = await fetch(baseUrl).then((r) => r.text())
+  const asset = page.match(/\/assets\/index-[A-Za-z0-9_-]+\.js/)
+  if (!asset) fail(`Could not find the app bundle at ${baseUrl}. Set GANTTALF_SUPABASE_URL and GANTTALF_SUPABASE_ANON_KEY to read share links.`)
+  const bundle = await fetch(`${baseUrl}${asset[0]}`).then((r) => r.text())
+  const url = bundle.match(/https:\/\/[a-z0-9]+\.supabase\.co/)
+  const key = bundle.match(/eyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]+/)
+  if (!url || !key) fail(`Could not read the Supabase settings from ${baseUrl}. Set GANTTALF_SUPABASE_URL and GANTTALF_SUPABASE_ANON_KEY instead.`)
+
+  const found = { url: url[0], key: key[0], at: Date.now() }
+  try {
+    writeFileSync(cacheFile, JSON.stringify(found))
+  } catch {
+    // cache is an optimisation; ignore a read-only tmpdir
+  }
+  return found
+}
+
+const readSharedChart = async (baseUrl, token) => {
+  const { url, key } = await discoverConfig(baseUrl)
+  let res
+  try {
+    res = await fetch(`${url}/rest/v1/rpc/get_shared_chart`, {
+      method: 'POST',
+      headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_token: token }),
+    })
+  } catch (e) {
+    fail(`Could not reach ${url}: ${e.message}`)
+  }
+  if (!res.ok) fail(`Share lookup failed (HTTP ${res.status}). ${await res.text()}`)
+  const rows = await res.json()
+  if (!Array.isArray(rows) || !rows.length) {
+    fail('That share link is not valid any more — sharing may have been turned off by the owner.')
+  }
+  const chart = rows[0]
+  const data = chart?.data?.rows
+  if (!Array.isArray(data)) fail('The shared chart has no rows.')
+  console.error(`Read "${chart.name}" (${data.length} rows, saved ${String(chart.updated_at).slice(0, 10)})`)
+  return data.map((r) => FIELDS.reduce((o, f) => ((o[f] = r[f] ?? null), o), {}))
+}
+
 // --- read mode -------------------------------------------------------------
 const readChart = async (source, outFile) => {
   let rows
@@ -145,10 +216,20 @@ const readChart = async (source, outFile) => {
     if (!existsSync(source)) fail(`No such file: ${source}`)
     rows = await readWorkbook(source)
   } else if (/^https?:\/\//i.test(source)) {
-    fail(
-      'That looks like a saved-chart link (/c/… or /s/…), which lives in the database and cannot be read offline.\n' +
-      'Open it in Ganttalf and use Export → Excel, then pass the .xlsx here. A snapshot link (#g=…) works directly.'
-    )
+    const u = new URL(source)
+    const shared = u.pathname.match(/^\/s\/([A-Za-z0-9_-]{16,})$/)
+    if (shared) {
+      rows = await readSharedChart(`${u.protocol}//${u.host}`, shared[1])
+    } else if (/^\/c\//.test(u.pathname)) {
+      fail(
+        'That is a saved-chart link (/c/…). It lives in the database behind the owner\'s sign-in,\n' +
+        'so it cannot be read without their account. Two ways to share it with me:\n' +
+        '  • Export → Share live link, then pass the /s/… link — I can read that directly.\n' +
+        '  • Export → Excel, then pass the .xlsx.'
+      )
+    } else {
+      fail(`Not a readable Ganttalf link: ${source}\nUse a /s/<token> share link, a #g=… snapshot link, or an .xlsx file.`)
+    }
   } else if (existsSync(source)) {
     rows = await readWorkbook(source)
   } else {

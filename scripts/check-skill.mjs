@@ -7,11 +7,17 @@
 //   3. the skill's FIELDS order matches src/lib/share.js
 //   4. a chart survives the skill encoder → app decoder round trip
 //   5. a chart survives the skill's .xlsx writer → app parser round trip
-import { execFileSync } from 'node:child_process'
+import { execFile, execFileSync } from 'node:child_process'
+import { createServer } from 'node:http'
+import { promisify } from 'node:util'
 import { mkdtempSync, readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
+
+// execFileSync would block this process's event loop, so the mocked share
+// server below could never answer the child. Those checks use the async form.
+const run = promisify(execFile)
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const SKILL_DIR = join(ROOT, '.claude/skills/ganttalf')
@@ -153,6 +159,64 @@ await check('--read recovers the rows from the .xlsx', async () => {
   const out = execFileSync('node', [SCRIPT, '--read', xlsxOut], { encoding: 'utf8' })
   diff(FIXTURE, JSON.parse(out))
   return 'lossless'
+})
+
+// --- 6. live share links ---------------------------------------------------
+await check('a /s/ share link reads back through the share RPC', async () => {
+  const chart = {
+    name: 'Fixture chart',
+    updated_at: '2026-04-02T10:00:00Z',
+    data: { scale: 'month', rows: FIXTURE },
+  }
+  let seen = null
+  const srv = createServer(async (req, res) => {
+    if (req.method === 'POST' && req.url === '/rest/v1/rpc/get_shared_chart') {
+      let body = ''
+      for await (const c of req) body += c
+      seen = { token: JSON.parse(body).p_token, apikey: req.headers.apikey }
+      res.writeHead(200, { 'Content-Type': 'application/json' })
+      return res.end(JSON.stringify(seen.token === 'fixturetoken12345678' ? [chart] : []))
+    }
+    res.writeHead(404).end()
+  })
+  await new Promise((r) => srv.listen(0, '127.0.0.1', r))
+  const port = srv.address().port
+  const env = {
+    ...process.env,
+    GANTTALF_SUPABASE_URL: `http://127.0.0.1:${port}`,
+    GANTTALF_SUPABASE_ANON_KEY: 'fixture-key',
+  }
+  try {
+    const { stdout } = await run('node', [SCRIPT, '--read', 'https://ganttalf.app/s/fixturetoken12345678'], { env })
+    diff(FIXTURE, JSON.parse(stdout))
+    assert(seen?.token === 'fixturetoken12345678', 'token was not forwarded to the RPC')
+    assert(seen?.apikey === 'fixture-key', 'anon key was not sent as the apikey header')
+
+    // a revoked token must fail loudly rather than yield an empty chart
+    let revoked = false
+    try {
+      await run('node', [SCRIPT, '--read', 'https://ganttalf.app/s/revokedtoken12345678'], { env })
+    } catch {
+      revoked = true
+    }
+    assert(revoked, 'a revoked share token should exit non-zero')
+  } finally {
+    srv.closeAllConnections()
+    await new Promise((r) => srv.close(r))
+  }
+  return 'token forwarded, rows mapped'
+})
+
+await check('a /c/ saved-chart link explains how to share it', () => {
+  let msg = ''
+  try {
+    execFileSync('node', [SCRIPT, '--read', 'https://ganttalf.app/c/094f33c4-3bbd-4125-8e9e-16fb0d4fbcf6'], { encoding: 'utf8', stdio: 'pipe' })
+  } catch (e) {
+    msg = e.stderr ?? ''
+  }
+  assert(msg.includes('/s/'), 'should point at the live share link')
+  assert(/Excel/i.test(msg), 'should offer the Excel export fallback')
+  return 'actionable message'
 })
 
 console.log()

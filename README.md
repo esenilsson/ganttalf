@@ -88,8 +88,14 @@ node make-gantt.mjs --read <link|xlsx> rows.json   # read one back to JSON
 export GANTTALF_URL=http://localhost:5173      # defaults to https://ganttalf.app
 ```
 
-`--read` decodes `#g=` snapshot links and `.xlsx` files offline. Saved-chart (`/c/`) and
-live-share (`/s/`) links live in the database, so export those to Excel first.
+`--read` decodes `#g=` snapshot links and `.xlsx` files offline, and fetches `/s/<token>`
+share links through `get_shared_chart`, the same anonymous lookup the app uses. Saved
+charts (`/c/<id>`) sit behind the owner's sign-in, so share or export those first.
+
+Reading a share link needs the project URL and anon key. Both are public by design, so
+rather than committing them the script lifts them from the deployed bundle and caches
+them for a day. `GANTTALF_SUPABASE_URL` and `GANTTALF_SUPABASE_ANON_KEY` override that
+when self-hosting.
 
 ### Install it on any machine
 
