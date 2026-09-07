@@ -8,7 +8,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "template": "node scripts/make-template.js"
+    "template": "node scripts/make-template.js",
+    "check:skill": "node scripts/check-skill.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0"

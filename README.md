@@ -128,6 +128,20 @@ Code execution must be enabled under Settings → Capabilities, since the skill 
 bundled Node script. The zip holds the skill folder as its root entry and leaves
 `node_modules` out, which is what the uploader expects.
 
+Tagged builds publish that archive too, so you can hand someone a download link instead
+of a checkout:
+
+```sh
+git tag skill-v1 && git push origin skill-v1
+```
+
+### Keeping the two codecs in sync
+
+`npm run check:skill` asserts what the warning below only asks for: that the skill's
+field order matches `src/lib/share.js`, that a chart survives both round trips (share
+link and `.xlsx`), and that `SKILL.md` stays inside the Claude app's frontmatter limits.
+CI runs it on every pull request.
+
 ## ⚠️ Note on `src/lib/share.js`
 
 The `#g=` codec is shared with the skill's `make-gantt.mjs` encoder.
