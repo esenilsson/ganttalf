@@ -10,7 +10,6 @@
 // The URL encoding (compact arrays → JSON → deflate-raw → base64url) and the
 // spreadsheet header handling must stay byte-compatible with src/lib/share.js
 // and src/lib/excel.js in this repo.
-import XLSX from 'xlsx'
 import { deflateRawSync, inflateRawSync } from 'node:zlib'
 import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 
@@ -35,6 +34,21 @@ const fail = (msg) => {
   console.error(msg)
   process.exit(1)
 }
+
+// xlsx is only needed to read or write the spreadsheet. Share links use node's
+// built-in zlib, so the skill still works with no dependencies installed.
+let XLSX = null
+const loadXlsx = async () => {
+  if (XLSX) return XLSX
+  try {
+    XLSX = (await import('xlsx')).default
+  } catch {
+    return null
+  }
+  return XLSX
+}
+
+const NEED_XLSX = `The 'xlsx' package is not installed. Run this once, in the skill's own directory:\n  npm install --prefix "${import.meta.dirname}"`
 
 // --- date helpers (mirror src/lib/dates.js) --------------------------------
 const DAY_MS = 86400000
@@ -92,7 +106,9 @@ const decodeToken = (token) => {
 // --- spreadsheet reader (mirrors src/lib/excel.js) -------------------------
 const norm = (s) => String(s ?? '').toLowerCase().replace(/[\s_-]/g, '')
 
-const readWorkbook = (path) => {
+const readWorkbook = async (path) => {
+  const XLSX = await loadXlsx()
+  if (!XLSX) fail(NEED_XLSX)
   const wb = XLSX.read(readFileSync(path), { cellDates: true })
   const sheet = wb.Sheets[wb.SheetNames[0]]
   if (!sheet) fail(`${path} has no readable first sheet.`)
@@ -121,20 +137,20 @@ const readWorkbook = (path) => {
 }
 
 // --- read mode -------------------------------------------------------------
-const readChart = (source, outFile) => {
+const readChart = async (source, outFile) => {
   let rows
   if (/#?g=/.test(source)) {
     rows = decodeToken(source.slice(source.search(/#?g=/)).replace(/^#?g=/, '').split(/[&?]/)[0])
   } else if (/\.xlsx?$/i.test(source)) {
     if (!existsSync(source)) fail(`No such file: ${source}`)
-    rows = readWorkbook(source)
+    rows = await readWorkbook(source)
   } else if (/^https?:\/\//i.test(source)) {
     fail(
       'That looks like a saved-chart link (/c/… or /s/…), which lives in the database and cannot be read offline.\n' +
       'Open it in Ganttalf and use Export → Excel, then pass the .xlsx here. A snapshot link (#g=…) works directly.'
     )
   } else if (existsSync(source)) {
-    rows = readWorkbook(source)
+    rows = await readWorkbook(source)
   } else {
     rows = decodeToken(source)
   }
@@ -149,7 +165,7 @@ const readChart = (source, outFile) => {
 }
 
 // --- write mode ------------------------------------------------------------
-const writeChart = (inFile, outFile) => {
+const writeChart = async (inFile, outFile) => {
   let rows
   try {
     rows = JSON.parse(readFileSync(inFile, 'utf8'))
@@ -162,6 +178,14 @@ const writeChart = (inFile, outFile) => {
     for (const f of DATE_FIELDS) {
       if (r[f] != null && !ISO.test(r[f])) fail(`Bad date in "${r.activity}" ${f}: ${r[f]} (need yyyy-mm-dd)`)
     }
+  }
+
+  const shareUrl = `${BASE_URL}/#g=${encodeRows(rows)}`
+  const XLSX = await loadXlsx()
+  if (!XLSX) {
+    console.log(`Share URL: ${shareUrl}`)
+    console.error(`\nSkipped ${outFile} — ${NEED_XLSX}`)
+    process.exit(0)
   }
 
   const aoa = [HEADER, ...rows.map((r) => FIELDS.map((f) => (DATE_FIELDS.has(f) ? isoToDate(r[f]) : r[f] || null)))]
@@ -179,7 +203,7 @@ const writeChart = (inFile, outFile) => {
   XLSX.writeFile(wb, outFile)
 
   console.log(`Wrote ${outFile} (${rows.length} rows)`)
-  console.log(`Share URL: ${BASE_URL}/#g=${encodeRows(rows)}`)
+  console.log(`Share URL: ${shareUrl}`)
 }
 
 // --- entry -----------------------------------------------------------------
@@ -190,8 +214,8 @@ if (!argv.length || argv[0] === '-h' || argv[0] === '--help') {
 }
 if (argv[0] === '--read') {
   if (!argv[1]) fail(usage)
-  readChart(argv[1], argv[2])
+  await readChart(argv[1], argv[2])
 } else {
   if (argv.length < 2) fail(usage)
-  writeChart(argv[0], argv[1])
+  await writeChart(argv[0], argv[1])
 }

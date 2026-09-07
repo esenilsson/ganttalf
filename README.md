@@ -91,11 +91,29 @@ export GANTTALF_URL=http://localhost:5173      # defaults to https://ganttalf.ap
 `--read` decodes `#g=` snapshot links and `.xlsx` files offline. Saved-chart (`/c/`) and
 live-share (`/s/`) links live in the database, so export those to Excel first.
 
-To use it outside this repo, symlink it into your personal skills directory:
+### Install it on any machine
+
+The skill talks to the hosted app, so nothing needs to run locally. In Claude Code:
+
+```
+/plugin marketplace add esenilsson/ganttalf
+/plugin install ganttalf@ganttalf
+```
+
+That is the whole setup — the skill and its dependency are fetched for you, and
+`/plugin update ganttalf` picks up later changes. Then just ask for a Gantt chart.
+
+Prefer not to use plugins? Drop the folder into your personal skills directory:
 
 ```sh
-ln -s "$PWD/.claude/skills/ganttalf" ~/.claude/skills/ganttalf
+mkdir -p ~/.claude/skills/ganttalf
+curl -fsSL https://github.com/esenilsson/ganttalf/archive/refs/heads/main.tar.gz \
+  | tar -xz --strip-components=4 -C ~/.claude/skills/ganttalf ganttalf-main/.claude/skills/ganttalf
+npm install --prefix ~/.claude/skills/ganttalf   # optional, only for .xlsx output
 ```
+
+Without the `npm install` step the skill still produces share links; only the
+spreadsheet is skipped, and it tells you so.
 
 ## ⚠️ Note on `src/lib/share.js`
 
