@@ -75,14 +75,21 @@ variables. `vercel.json` rewrites all paths to `index.html` so `/c/<id>` and
 
 `.claude/skills/ganttalf/` is a [Claude Code](https://claude.com/claude-code) skill that
 turns a described project plan into a chart: it writes a re-importable `.xlsx` and prints
-a share link that opens the chart pre-loaded. Ask Claude for "a gantt chart for ..." while
-working in this repo and it picks the skill up automatically.
+a snapshot link that opens the chart pre-loaded. It reads charts back too, so you can hand
+Claude an existing link or spreadsheet and ask for changes. Ask for "a gantt chart for ..."
+while working in this repo and it picks the skill up automatically.
 
 ```sh
 cd .claude/skills/ganttalf && npm install
-export GANTTALF_URL=https://gantt.example.com     # defaults to http://localhost:5173
-node make-gantt.mjs rows.json plan.xlsx
+
+node make-gantt.mjs rows.json plan.xlsx        # write .xlsx + snapshot link
+node make-gantt.mjs --read <link|xlsx> rows.json   # read one back to JSON
+
+export GANTTALF_URL=http://localhost:5173      # defaults to https://ganttalf.app
 ```
+
+`--read` decodes `#g=` snapshot links and `.xlsx` files offline. Saved-chart (`/c/`) and
+live-share (`/s/`) links live in the database, so export those to Excel first.
 
 To use it outside this repo, symlink it into your personal skills directory:
 

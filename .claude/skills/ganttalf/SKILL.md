@@ -1,6 +1,6 @@
 ---
 name: ganttalf
-description: Create a Gantt chart with Ganttalf, a thinkcell-style Gantt chart maker. Use when the user asks for a gantt chart, project plan, project timeline, or roadmap with dated activities — it produces an .xlsx plus a share link that opens the chart pre-loaded in the app.
+description: Create or adjust a Gantt chart with Ganttalf, a thinkcell-style Gantt chart maker. Use when the user asks for a gantt chart, project plan, project timeline, or roadmap with dated activities, or when they refer to an existing chart (a share link or .xlsx) and want it changed — it produces an .xlsx plus a share link that opens the chart pre-loaded in the app.
 ---
 
 # Ganttalf — generate a Gantt chart
@@ -8,12 +8,11 @@ description: Create a Gantt chart with Ganttalf, a thinkcell-style Gantt chart m
 Produces two deliverables from a list of activities: a re-importable `.xlsx` and a
 share link that opens the chart ready to edit.
 
-**Target instance.** The link points at `$GANTTALF_URL`, defaulting to
-`http://localhost:5173` (the `npm run dev` server). Set the env var to your own
-deployment before running:
+**Target instance.** Links point at `$GANTTALF_URL`, defaulting to the hosted
+app at `https://ganttalf.app`. Set the env var to target another deployment:
 
 ```sh
-export GANTTALF_URL=https://gantt.example.com
+export GANTTALF_URL=http://localhost:5173
 ```
 
 ## Steps
@@ -45,12 +44,38 @@ export GANTTALF_URL=https://gantt.example.com
    Mention that the link opens the chart ready to edit — drag bars, edges and milestones,
    toggle Month/Week scale — and exports to Excel, PNG, SVG or native PowerPoint from there.
 
+## Adjusting an existing chart
+
+When the user refers to a chart they already have, read it back into rows, edit the
+JSON, and regenerate. The round trip is lossless, so the new link and `.xlsx` carry
+every field the original had.
+
+```sh
+node <skill-dir>/make-gantt.mjs --read <source> rows.json
+# edit rows.json
+node <skill-dir>/make-gantt.mjs rows.json <name>.xlsx
+```
+
+`<source>` is any of:
+
+- a **snapshot link** (`https://ganttalf.app/#g=…`) or the bare `#g=` token — decoded
+  offline, no account or network needed
+- an **.xlsx** exported from the app, or any spreadsheet with an `Activity` column
+
+Omit the output path to print the rows to stdout instead.
+
+**Saved-chart and live-share links cannot be read.** A `/c/<id>` or `/s/<token>` URL
+points at a row in the database behind the owner's sign-in, so there is nothing to
+decode locally. Ask the user to open it and use *Export → Excel*, then read that file.
+The script says as much if it is handed one.
+
 ## Notes
 
 - The `.xlsx` is the durable, re-importable format; the URL is for instant viewing and editing. Both contain the same data.
 - Dates must be ISO `yyyy-mm-dd` in the JSON; the script validates and fails loudly on bad dates.
 - Typical chart span is weeks-to-months; the app auto-scales the time axis and draws a today-line automatically.
-- The `#g=` codec must stay byte-compatible with `src/lib/share.js`. Change both or neither.
+- The `#g=` codec must stay byte-compatible with `src/lib/share.js`, and the spreadsheet header handling with `src/lib/excel.js`. Change both or neither.
+- Sign-in is **not** required for anything this skill produces. Snapshot links and `.xlsx` files work anonymously; an account is only needed to save charts server-side or mint a live `/s/` link.
 
 ## Installing outside this repo
 
