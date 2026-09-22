@@ -1,7 +1,7 @@
 <script>
   import { computeLayout, FONT } from '../lib/layout.js'
   import { shiftIso, isoToDays, daysToIso } from '../lib/dates.js'
-  import { store } from '../lib/stores.svelte.js'
+  import { store, reorderRow } from '../lib/stores.svelte.js'
 
   let svgEl = $state(null)
   const L = $derived(computeLayout(store.rows, { scale: store.scale }))
@@ -72,25 +72,41 @@
     }
   }
 
-  // ---- inline activity label editing --------------------------------------
+  // ---- inline text editing (activity / group / responsible) ---------------
+  // editing is { kind, index }: for 'activity'/'responsible' index is a row
+  // index; for 'group' it's an index into L.groups (one label spans a run of
+  // rows, so committing renames every row in that run).
   let editing = $state(null)
   let editText = $state('')
   let editCancelled = false
 
-  function beginLabelEdit(index) {
-    editing = index
-    editText = store.rows[index].activity
+  function currentValue(kind, index) {
+    if (kind === 'group') return store.rows[L.groups[index].startIdx].group ?? ''
+    return store.rows[index][kind] ?? ''
+  }
+
+  function beginEdit(kind, index) {
+    editing = { kind, index }
+    editText = currentValue(kind, index)
     editCancelled = false
   }
 
-  function finishLabelEdit() {
-    if (editing == null) return
-    if (!editCancelled) store.rows[editing].activity = editText
+  function finishEdit() {
+    if (!editing) return
+    if (!editCancelled) {
+      const { kind, index } = editing
+      if (kind === 'group') {
+        const g = L.groups[index]
+        for (let i = g.startIdx; i <= g.endIdx; i++) store.rows[i].group = editText
+      } else {
+        store.rows[index][kind] = editText
+      }
+    }
     editing = null
     editCancelled = false
   }
 
-  function onLabelKey(e) {
+  function onEditKey(e) {
     if (e.key === 'Enter') e.currentTarget.blur()
     else if (e.key === 'Escape') {
       editCancelled = true
@@ -101,6 +117,65 @@
   function focusAndSelect(el) {
     el.focus()
     el.select()
+  }
+
+  function inputStyle(size, weight = 400) {
+    return `width: 100%; height: 22px; box-sizing: border-box; font-family: ${FONT}; font-size: ${size}px; font-weight: ${weight}; color: #2B2320; background: #fff; border: 1px solid #9A948D; border-radius: 5px; padding: 0 6px; outline: none; box-shadow: 0 0 0 2px rgba(43, 35, 32, 0.25);`
+  }
+
+  // ---- vertical drag to reorder rows (and re-home them into a group) -------
+  // Dragging an activity label past a small threshold picks the row up; the
+  // slot the pointer hovers becomes the drop target, and the row adopts the
+  // group it lands among. The threshold keeps double-click-to-rename working.
+  let rowDrag = $state(null) // { index, startClientY, slot, armed } | null
+  const ROW_DRAG_ARM = 4 // px of travel before a press becomes a drag
+
+  function beginRowDrag(e, index) {
+    if (e.button && e.button !== 0) return
+    rowDrag = { index, startClientY: e.clientY, slot: index, armed: false }
+    window.addEventListener('pointermove', onRowDrag)
+    window.addEventListener('pointerup', endRowDrag)
+    window.addEventListener('keydown', onRowDragKey)
+  }
+
+  function clientYToSlot(clientY) {
+    const rect = svgEl.getBoundingClientRect()
+    const svgY = (clientY - rect.top) * (D.totalHeight / rect.height)
+    const slot = Math.round((svgY - D.bodyTop) / D.rowH)
+    return Math.max(0, Math.min(store.rows.length, slot))
+  }
+
+  function onRowDrag(e) {
+    if (!rowDrag) return
+    if (!rowDrag.armed) {
+      if (Math.abs(e.clientY - rowDrag.startClientY) < ROW_DRAG_ARM) return
+      rowDrag.armed = true
+    }
+    rowDrag.slot = clientYToSlot(e.clientY)
+  }
+
+  function onRowDragKey(e) {
+    if (e.key === 'Escape') { rowDrag = null; stopRowDrag() }
+  }
+
+  function stopRowDrag() {
+    window.removeEventListener('pointermove', onRowDrag)
+    window.removeEventListener('pointerup', endRowDrag)
+    window.removeEventListener('keydown', onRowDragKey)
+  }
+
+  function endRowDrag() {
+    const rd = rowDrag
+    stopRowDrag()
+    rowDrag = null
+    if (!rd || !rd.armed) return
+    const from = rd.index
+    const to = rd.slot > from ? rd.slot - 1 : rd.slot
+    if (to === from) return
+    // Adopt the group of the drop's new neighbours (prefer the row above).
+    const reduced = store.rows.filter((_, i) => i !== from)
+    const group = reduced[to - 1]?.group ?? reduced[to]?.group ?? ''
+    reorderRow(from, to, group)
   }
 
   function endDrag() {
@@ -120,7 +195,7 @@
     height={D.totalHeight}
     viewBox="0 0 {D.totalWidth} {D.totalHeight}"
     font-family={FONT}
-    style="user-select: none;"
+    style="user-select: none;{rowDrag?.armed ? ' cursor: grabbing;' : ''}"
   >
     <rect width={D.totalWidth} height={D.totalHeight} fill="white" />
 
@@ -161,26 +236,29 @@
         <line x1={D.groupColX} y1={g.yTop} x2={D.totalWidth - 16} y2={g.yTop} stroke="#2B2320" stroke-width="1" />
       {/if}
       {#if L.hasGroups}
-        <text x={D.groupColX + D.groupColW - 16} y={g.labelY} text-anchor="end" dominant-baseline="middle" font-size="15" font-weight="700" fill="#2B2320">{g.name}</text>
+        {#if editing?.kind === 'group' && editing.index === gi}
+          {@render editBox(D.groupColX - 4, g.labelY - 11, D.groupColW, inputStyle(15, 700))}
+        {:else}
+          <text x={D.groupColX + D.groupColW - 16} y={g.labelY} text-anchor="end" dominant-baseline="middle" font-size="15" font-weight="700" fill="#2B2320" style="cursor: text;" ondblclick={() => beginEdit('group', gi)}>{g.name}</text>
+        {/if}
       {/if}
     {/each}
 
+    <!-- inline edit input, shared by activity / group / responsible -->
+    {#snippet editBox(x, y, w, style)}
+      <foreignObject {x} {y} width={w} height={22}>
+        <div xmlns="http://www.w3.org/1999/xhtml" style="height: 100%; display: flex; align-items: center;">
+          <input use:focusAndSelect bind:value={editText} onblur={finishEdit} onkeydown={onEditKey} {style} />
+        </div>
+      </foreignObject>
+    {/snippet}
+
     <!-- rows -->
     {#each L.items as it (it.row.id)}
-      {#if editing === it.index}
-        <foreignObject x={D.activityColX - 7} y={it.labelY - 11} width={D.activityColW + 14} height={22}>
-          <div xmlns="http://www.w3.org/1999/xhtml" style="height: 100%; display: flex; align-items: center;">
-            <input
-              use:focusAndSelect
-              bind:value={editText}
-              onblur={finishLabelEdit}
-              onkeydown={onLabelKey}
-              style="width: 100%; height: 22px; box-sizing: border-box; font-family: {FONT}; font-size: 14px; color: #2B2320; background: #fff; border: 1px solid #9A948D; border-radius: 5px; padding: 0 6px; outline: none; box-shadow: 0 0 0 2px rgba(43, 35, 32, 0.25);"
-            />
-          </div>
-        </foreignObject>
+      {#if editing?.kind === 'activity' && editing.index === it.index}
+        {@render editBox(D.activityColX - 7, it.labelY - 11, D.activityColW + 14, inputStyle(14))}
       {:else}
-        <text x={D.activityColX} y={it.labelY} dominant-baseline="middle" font-size="14" fill="#2B2320" style="cursor: text;" ondblclick={() => beginLabelEdit(it.index)}>{it.row.activity}</text>
+        <text x={D.activityColX} y={it.labelY} dominant-baseline="middle" font-size="14" fill="#2B2320" style="cursor: grab;" onpointerdown={(e) => beginRowDrag(e, it.index)} ondblclick={() => beginEdit('activity', it.index)}>{it.row.activity}</text>
       {/if}
 
       <!-- tentative prefix / suffix (dashed outline) -->
@@ -224,8 +302,13 @@
       {/if}
 
       <!-- responsible -->
-      {#if it.row.responsible && it.rightEdgeX != null}
-        <text x={D.chartX + it.rightEdgeX + (it.milestoneX != null ? 78 : 8)} y={it.cy} dominant-baseline="middle" font-size="11" fill="#9A948D">{it.row.responsible}</text>
+      {#if it.rightEdgeX != null}
+        {@const rx = D.chartX + it.rightEdgeX + (it.milestoneX != null ? 78 : 8)}
+        {#if editing?.kind === 'responsible' && editing.index === it.index}
+          {@render editBox(rx - 4, it.cy - 11, 140, inputStyle(11))}
+        {:else if it.row.responsible}
+          <text x={rx} y={it.cy} dominant-baseline="middle" font-size="11" fill="#9A948D" style="cursor: text;" ondblclick={() => beginEdit('responsible', it.index)}>{it.row.responsible}</text>
+        {/if}
       {/if}
     {/each}
 
@@ -246,6 +329,12 @@
       <line x1={D.chartX + L.todayX} y1={D.headerTop + 10} x2={D.chartX + L.todayX} y2={D.bodyBottom + 6} stroke="#2B2320" stroke-width="1.6" stroke-dasharray="7 5" />
       <polygon points="{D.chartX + L.todayX - 8},{D.bodyBottom + 24} {D.chartX + L.todayX + 8},{D.bodyBottom + 24} {D.chartX + L.todayX},{D.bodyBottom + 10}" fill="#2B2320" />
       <text x={D.chartX + L.todayX} y={D.bodyBottom + 42} text-anchor="middle" font-size="14" fill="#2B2320">{L.todayLabel}</text>
+    {/if}
+
+    <!-- row reorder feedback: highlight the picked-up row + show the drop line -->
+    {#if rowDrag?.armed}
+      <rect x={D.groupColX} y={D.bodyTop + rowDrag.index * D.rowH} width={D.totalWidth - D.groupColX - 16} height={D.rowH} fill="#2B2320" opacity="0.06" />
+      <line x1={D.groupColX} y1={D.bodyTop + rowDrag.slot * D.rowH} x2={D.totalWidth - 16} y2={D.bodyTop + rowDrag.slot * D.rowH} stroke="#2B2320" stroke-width="2.5" stroke-linecap="round" />
     {/if}
   </svg>
 </div>
