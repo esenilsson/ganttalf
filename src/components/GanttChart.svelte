@@ -72,6 +72,37 @@
     }
   }
 
+  // ---- inline activity label editing --------------------------------------
+  let editing = $state(null)
+  let editText = $state('')
+  let editCancelled = false
+
+  function beginLabelEdit(index) {
+    editing = index
+    editText = store.rows[index].activity
+    editCancelled = false
+  }
+
+  function finishLabelEdit() {
+    if (editing == null) return
+    if (!editCancelled) store.rows[editing].activity = editText
+    editing = null
+    editCancelled = false
+  }
+
+  function onLabelKey(e) {
+    if (e.key === 'Enter') e.currentTarget.blur()
+    else if (e.key === 'Escape') {
+      editCancelled = true
+      e.currentTarget.blur()
+    }
+  }
+
+  function focusAndSelect(el) {
+    el.focus()
+    el.select()
+  }
+
   function endDrag() {
     drag = null
     window.removeEventListener('pointermove', onDrag)
@@ -136,7 +167,21 @@
 
     <!-- rows -->
     {#each L.items as it (it.row.id)}
-      <text x={D.activityColX} y={it.labelY} dominant-baseline="middle" font-size="14" fill="#2B2320">{it.row.activity}</text>
+      {#if editing === it.index}
+        <foreignObject x={D.activityColX - 7} y={it.labelY - 11} width={D.activityColW + 14} height={22}>
+          <div xmlns="http://www.w3.org/1999/xhtml" style="height: 100%; display: flex; align-items: center;">
+            <input
+              use:focusAndSelect
+              bind:value={editText}
+              onblur={finishLabelEdit}
+              onkeydown={onLabelKey}
+              style="width: 100%; height: 22px; box-sizing: border-box; font-family: {FONT}; font-size: 14px; color: #2B2320; background: #fff; border: 1px solid #9A948D; border-radius: 5px; padding: 0 6px; outline: none; box-shadow: 0 0 0 2px rgba(43, 35, 32, 0.25);"
+            />
+          </div>
+        </foreignObject>
+      {:else}
+        <text x={D.activityColX} y={it.labelY} dominant-baseline="middle" font-size="14" fill="#2B2320" style="cursor: text;" ondblclick={() => beginLabelEdit(it.index)}>{it.row.activity}</text>
+      {/if}
 
       <!-- tentative prefix / suffix (dashed outline) -->
       {#each [it.preTentative, it.postTentative] as seg, si}
