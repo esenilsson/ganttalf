@@ -98,6 +98,8 @@ export function computeLayout(rows, { totalWidth = 1420, scale = 'month' } = {})
 
   const groupBands = groups.map((g) => ({
     name: g.name,
+    startIdx: g.startIdx,
+    endIdx: g.endIdx,
     yTop: bodyTop + g.startIdx * ROW_H,
     yBottom: bodyTop + (g.endIdx + 1) * ROW_H,
     labelY: bodyTop + g.startIdx * ROW_H + ROW_H / 2 + 2,

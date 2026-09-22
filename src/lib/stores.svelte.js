@@ -75,3 +75,11 @@ export function moveRow(index, delta) {
   const [r] = store.rows.splice(index, 1)
   store.rows.splice(j, 0, r)
 }
+
+// Drag-reorder: pull the row out, optionally re-home it into a group, and drop
+// it back at an absolute index (measured in the post-removal array).
+export function reorderRow(from, to, group) {
+  const [r] = store.rows.splice(from, 1)
+  if (group !== undefined) r.group = group
+  store.rows.splice(Math.max(0, Math.min(store.rows.length, to)), 0, r)
+}
