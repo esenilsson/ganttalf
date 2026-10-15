@@ -121,9 +121,9 @@
     el.select()
   }
 
-  function appendRow() {
+  function appendRow(kind) {
     finishEdit()
-    addRow()
+    addRow(store.rows.length - 1, kind)
     beginEdit('activity', store.rows.length - 1)
   }
 
@@ -351,7 +351,8 @@
 </div>
 
 {#if !store.readonly}
-  <div class="flex justify-center border-t border-gt-line-soft px-4 py-2">
-    <Button variant="outline" size="icon" aria-label="Add row" title="Add row" onclick={appendRow}>＋</Button>
+  <div class="flex justify-center gap-2 border-t border-gt-line-soft px-4 py-2">
+    <Button variant="outline" size="sm" onclick={() => appendRow('task')}>＋ Activity</Button>
+    <Button variant="outline" size="sm" onclick={() => appendRow('milestone')}>＋ Milestone</Button>
   </div>
 {/if}

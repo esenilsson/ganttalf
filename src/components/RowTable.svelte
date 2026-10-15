@@ -5,10 +5,12 @@
 
   let rootEl
 
-  async function appendRow(kind = 'task') {
-    addRow(store.rows.length - 1, kind)
+  // Insert below and put the cursor in the new row's Activity cell, matching
+  // the chart's add buttons, which open the new label for editing.
+  async function insertRowBelow(index) {
+    addRow(index)
     await tick()
-    const input = rootEl?.querySelector(`input[data-cell="${store.rows.length - 1}:1"]`)
+    const input = rootEl?.querySelector(`input[data-cell="${index + 1}:1"]`)
     input?.focus()
     input?.select()
   }
@@ -83,7 +85,7 @@
           <td class="whitespace-nowrap px-2 py-1 text-right align-middle">
             <Button variant="ghost" size="icon" title="Move up" onclick={() => moveRow(i, -1)}>↑</Button>
             <Button variant="ghost" size="icon" title="Move down" onclick={() => moveRow(i, 1)}>↓</Button>
-            <Button variant="ghost" size="icon" title="Insert row below" onclick={() => addRow(i)}>＋</Button>
+            <Button variant="ghost" size="icon" title="Insert row below" onclick={() => insertRowBelow(i)}>＋</Button>
             {#if row.start || row.end || row.tentativeStart || row.tentativeEnd || !row.milestone}
               <Button variant="ghost" size="icon" aria-label="Convert to milestone" title="Convert to milestone (clears task dates)" onclick={() => convertToMilestone(i)}>△</Button>
             {/if}
@@ -93,8 +95,4 @@
       {/each}
     </tbody>
   </table>
-</div>
-<div class="flex gap-1">
-  <Button variant="ghost" size="sm" onclick={() => appendRow()}>＋ Add row</Button>
-  <Button variant="ghost" size="sm" onclick={() => appendRow('milestone')}>＋ Milestone</Button>
 </div>
