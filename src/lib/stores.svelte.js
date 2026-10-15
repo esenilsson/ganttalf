@@ -1,4 +1,5 @@
 import { newId } from './excel.js'
+import { todayIso } from './dates.js'
 
 export const store = $state({
   rows: [],
@@ -49,20 +50,26 @@ export function serializeChart() {
   }
 }
 
-export function addRow(afterIndex = store.rows.length - 1) {
+export function addRow(afterIndex = store.rows.length - 1, kind = 'task') {
   const prev = store.rows[afterIndex]
   store.rows.splice(afterIndex + 1, 0, {
     id: newId(),
     group: prev?.group ?? '',
-    activity: 'New activity',
+    activity: kind === 'milestone' ? 'New milestone' : 'New activity',
     tentativeStart: null,
-    start: prev?.start ?? null,
-    end: prev?.end ?? null,
+    start: kind === 'milestone' ? null : prev?.start ?? null,
+    end: kind === 'milestone' ? null : prev?.end ?? null,
     tentativeEnd: null,
-    milestone: null,
+    milestone: kind === 'milestone' ? prev?.milestone ?? prev?.start ?? todayIso() : null,
     responsible: '',
     dependsOn: '',
   })
+}
+
+export function convertToMilestone(index) {
+  const row = store.rows[index]
+  row.milestone = row.milestone ?? row.start ?? row.tentativeStart ?? row.end ?? row.tentativeEnd ?? todayIso()
+  row.tentativeStart = row.start = row.end = row.tentativeEnd = null
 }
 
 export function deleteRow(index) {

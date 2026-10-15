@@ -1,7 +1,8 @@
 <script>
   import { computeLayout, FONT } from '../lib/layout.js'
   import { shiftIso, isoToDays, daysToIso } from '../lib/dates.js'
-  import { store, reorderRow } from '../lib/stores.svelte.js'
+  import { store, reorderRow, addRow } from '../lib/stores.svelte.js'
+  import Button from './ui/Button.svelte'
 
   let svgEl = $state(null)
   const L = $derived(computeLayout(store.rows, { scale: store.scale }))
@@ -117,6 +118,12 @@
   function focusAndSelect(el) {
     el.focus()
     el.select()
+  }
+
+  function appendRow(kind = 'task') {
+    finishEdit()
+    addRow(store.rows.length - 1, kind)
+    beginEdit('activity', store.rows.length - 1)
   }
 
   function inputStyle(size, weight = 400) {
@@ -338,3 +345,10 @@
     {/if}
   </svg>
 </div>
+
+{#if !store.readonly}
+  <div class="flex gap-1 border-t border-gt-line-soft px-4 py-2">
+    <Button variant="ghost" size="sm" onclick={() => appendRow()}>＋ Add row</Button>
+    <Button variant="ghost" size="sm" onclick={() => appendRow('milestone')}>＋ Milestone</Button>
+  </div>
+{/if}

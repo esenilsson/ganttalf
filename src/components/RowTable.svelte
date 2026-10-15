@@ -1,8 +1,17 @@
 <script>
-  import { store, addRow, deleteRow, moveRow } from '../lib/stores.svelte.js'
+  import { tick } from 'svelte'
+  import { store, addRow, deleteRow, moveRow, convertToMilestone } from '../lib/stores.svelte.js'
   import Button from './ui/Button.svelte'
 
   let rootEl
+
+  async function appendRow(kind = 'task') {
+    addRow(store.rows.length - 1, kind)
+    await tick()
+    const input = rootEl?.querySelector(`input[data-cell="${store.rows.length - 1}:1"]`)
+    input?.focus()
+    input?.select()
+  }
 
   // Spreadsheet-style navigation: Enter / Shift+Enter and ↑ / ↓ move focus to
   // the same column in the next/previous row. Date inputs keep plain arrows
@@ -75,10 +84,17 @@
             <Button variant="ghost" size="icon" title="Move up" onclick={() => moveRow(i, -1)}>↑</Button>
             <Button variant="ghost" size="icon" title="Move down" onclick={() => moveRow(i, 1)}>↓</Button>
             <Button variant="ghost" size="icon" title="Insert row below" onclick={() => addRow(i)}>＋</Button>
+            {#if row.start || row.end || row.tentativeStart || row.tentativeEnd || !row.milestone}
+              <Button variant="ghost" size="icon" aria-label="Convert to milestone" title="Convert to milestone (clears task dates)" onclick={() => convertToMilestone(i)}>△</Button>
+            {/if}
             <Button variant="ghost" size="icon" class="text-gt-brick-500" title="Delete row" onclick={() => deleteRow(i)}>✕</Button>
           </td>
         </tr>
       {/each}
     </tbody>
   </table>
+</div>
+<div class="flex gap-1">
+  <Button variant="ghost" size="sm" onclick={() => appendRow()}>＋ Add row</Button>
+  <Button variant="ghost" size="sm" onclick={() => appendRow('milestone')}>＋ Milestone</Button>
 </div>
