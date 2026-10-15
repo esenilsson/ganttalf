@@ -1,16 +1,26 @@
 <script>
   import { tick } from 'svelte'
-  import { store, addRow, deleteRow, moveRow, convertToMilestone } from '../lib/stores.svelte.js'
+  import { store, addRow, deleteRow, moveRow, convertToMilestone, hasTaskDates, isMilestoneOnly } from '../lib/stores.svelte.js'
   import Button from './ui/Button.svelte'
 
   let rootEl
 
-  async function appendRow(kind = 'task') {
-    addRow(store.rows.length - 1, kind)
+  // Insert below and put the cursor in the new row's Activity cell, matching
+  // the chart's add buttons, which open the new label for editing.
+  async function insertRowBelow(index) {
+    addRow(index)
     await tick()
-    const input = rootEl?.querySelector(`input[data-cell="${store.rows.length - 1}:1"]`)
+    const input = rootEl?.querySelector(`input[data-cell="${index + 1}:1"]`)
     input?.focus()
     input?.select()
+  }
+
+  // There's no undo, so ask before throwing away a task's dates.
+  function convertRow(index) {
+    const row = store.rows[index]
+    const name = row.activity?.trim() || 'this row'
+    if (hasTaskDates(row) && !confirm(`Convert "${name}" to a milestone? Its start and end dates will be cleared.`)) return
+    convertToMilestone(index)
   }
 
   // Spreadsheet-style navigation: Enter / Shift+Enter and ↑ / ↓ move focus to
@@ -81,20 +91,16 @@
             </td>
           {/each}
           <td class="whitespace-nowrap px-2 py-1 text-right align-middle">
-            <Button variant="ghost" size="icon" title="Move up" onclick={() => moveRow(i, -1)}>↑</Button>
-            <Button variant="ghost" size="icon" title="Move down" onclick={() => moveRow(i, 1)}>↓</Button>
-            <Button variant="ghost" size="icon" title="Insert row below" onclick={() => addRow(i)}>＋</Button>
-            {#if row.start || row.end || row.tentativeStart || row.tentativeEnd || !row.milestone}
-              <Button variant="ghost" size="icon" aria-label="Convert to milestone" title="Convert to milestone (clears task dates)" onclick={() => convertToMilestone(i)}>△</Button>
+            <Button variant="ghost" size="icon" aria-label="Move up" title="Move up" onclick={() => moveRow(i, -1)}>↑</Button>
+            <Button variant="ghost" size="icon" aria-label="Move down" title="Move down" onclick={() => moveRow(i, 1)}>↓</Button>
+            <Button variant="ghost" size="icon" aria-label="Insert row below" title="Insert row below" onclick={() => insertRowBelow(i)}>＋</Button>
+            {#if !isMilestoneOnly(row)}
+              <Button variant="ghost" size="icon" aria-label="Convert to milestone" title="Convert to milestone (clears task dates)" onclick={() => convertRow(i)}>△</Button>
             {/if}
-            <Button variant="ghost" size="icon" class="text-gt-brick-500" title="Delete row" onclick={() => deleteRow(i)}>✕</Button>
+            <Button variant="ghost" size="icon" class="text-gt-brick-500" aria-label="Delete row" title="Delete row" onclick={() => deleteRow(i)}>✕</Button>
           </td>
         </tr>
       {/each}
     </tbody>
   </table>
-</div>
-<div class="flex gap-1">
-  <Button variant="ghost" size="sm" onclick={() => appendRow()}>＋ Add row</Button>
-  <Button variant="ghost" size="sm" onclick={() => appendRow('milestone')}>＋ Milestone</Button>
 </div>

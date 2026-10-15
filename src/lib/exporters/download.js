@@ -12,3 +12,10 @@ export function serializeSvg(svgEl) {
   clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
   return '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(clone)
 }
+
+// One name for every export format: the saved chart's name, else the
+// imported file's, minus its extension and characters filesystems reject.
+export function exportBaseName(chartName, fileName) {
+  const name = (chartName?.trim() || fileName?.trim() || '').replace(/\.(xlsx|xls|csv)$/i, '')
+  return name.replace(/[\\/:*?"<>|]+/g, '-').replace(/^[-\s]+|[-\s]+$/g, '') || 'Untitled project'
+}

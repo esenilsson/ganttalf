@@ -121,9 +121,9 @@
     el.select()
   }
 
-  function appendRow() {
+  function appendRow(kind) {
     finishEdit()
-    addRow()
+    addRow(store.rows.length - 1, kind)
     beginEdit('activity', store.rows.length - 1)
   }
 
@@ -195,10 +195,12 @@
   const EDGE = 7 // px hit zone for resize handles
 </script>
 
-<div class="p-2 sm:p-4">
+<!-- Scale the chart down to fit, but not below a readable width: narrower
+     viewports scroll horizontally instead of shrinking labels and handles. -->
+<div class="overflow-x-auto p-2 sm:p-4">
   <svg
     bind:this={svgEl}
-    class="block h-auto max-w-full"
+    class="block h-auto max-w-full min-w-[960px]"
     xmlns="http://www.w3.org/2000/svg"
     width={D.totalWidth}
     height={D.totalHeight}
@@ -349,7 +351,8 @@
 </div>
 
 {#if !store.readonly}
-  <div class="flex justify-center border-t border-gt-line-soft px-4 py-2">
-    <Button variant="outline" size="icon" aria-label="Add row" title="Add row" onclick={appendRow}>＋</Button>
+  <div class="flex justify-center gap-2 border-t border-gt-line-soft px-4 py-2">
+    <Button variant="outline" size="sm" onclick={() => appendRow('task')}>＋ Activity</Button>
+    <Button variant="outline" size="sm" onclick={() => appendRow('milestone')}>＋ Milestone</Button>
   </div>
 {/if}
