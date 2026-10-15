@@ -66,6 +66,11 @@ export function addRow(afterIndex = store.rows.length - 1, kind = 'task') {
   })
 }
 
+export const hasTaskDates = (row) =>
+  Boolean(row.tentativeStart || row.start || row.end || row.tentativeEnd)
+
+export const isMilestoneOnly = (row) => Boolean(row.milestone) && !hasTaskDates(row)
+
 export function convertToMilestone(index) {
   const row = store.rows[index]
   row.milestone = row.milestone ?? row.start ?? row.tentativeStart ?? row.end ?? row.tentativeEnd ?? todayIso()
