@@ -195,10 +195,12 @@
   const EDGE = 7 // px hit zone for resize handles
 </script>
 
-<div class="p-2 sm:p-4">
+<!-- Scale the chart down to fit, but not below a readable width: narrower
+     viewports scroll horizontally instead of shrinking labels and handles. -->
+<div class="overflow-x-auto p-2 sm:p-4">
   <svg
     bind:this={svgEl}
-    class="block h-auto max-w-full"
+    class="block h-auto max-w-full min-w-[960px]"
     xmlns="http://www.w3.org/2000/svg"
     width={D.totalWidth}
     height={D.totalHeight}
