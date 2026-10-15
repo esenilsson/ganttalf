@@ -25,6 +25,7 @@
       index,
       mode,
       x0: e.clientX,
+      pixelsPerDay: L.ts.dayWidth * svgEl.getBoundingClientRect().width / D.totalWidth,
       orig: {
         tentativeStart: r.tentativeStart,
         start: r.start,
@@ -39,7 +40,7 @@
 
   function onDrag(e) {
     if (!drag) return
-    const delta = Math.round((e.clientX - drag.x0) / L.ts.dayWidth)
+    const delta = Math.round((e.clientX - drag.x0) / drag.pixelsPerDay)
     const r = store.rows[drag.index]
     const o = drag.orig
     const clampMin = (iso, minIso) =>
@@ -120,9 +121,9 @@
     el.select()
   }
 
-  function appendRow(kind = 'task') {
+  function appendRow() {
     finishEdit()
-    addRow(store.rows.length - 1, kind)
+    addRow()
     beginEdit('activity', store.rows.length - 1)
   }
 
@@ -194,9 +195,10 @@
   const EDGE = 7 // px hit zone for resize handles
 </script>
 
-<div class="overflow-x-auto p-2 sm:p-4">
+<div class="p-2 sm:p-4">
   <svg
     bind:this={svgEl}
+    class="block h-auto max-w-full"
     xmlns="http://www.w3.org/2000/svg"
     width={D.totalWidth}
     height={D.totalHeight}
@@ -348,7 +350,6 @@
 
 {#if !store.readonly}
   <div class="flex gap-1 border-t border-gt-line-soft px-4 py-2">
-    <Button variant="ghost" size="sm" onclick={() => appendRow()}>＋ Add row</Button>
-    <Button variant="ghost" size="sm" onclick={() => appendRow('milestone')}>＋ Milestone</Button>
+    <Button variant="outline" size="icon" aria-label="Add row" title="Add row" onclick={appendRow}>＋</Button>
   </div>
 {/if}
