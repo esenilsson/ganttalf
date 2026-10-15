@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { store, addRow, convertToMilestone, isMilestoneOnly } from './stores.svelte.js'
+import { store, addRow, convertToMilestone, isMilestoneOnly, groupAtDrop } from './stores.svelte.js'
 
 const task = (fields) => ({
   group: 'G', activity: 'A', tentativeStart: null, start: null, end: null,
@@ -51,5 +51,26 @@ describe('isMilestoneOnly', () => {
     expect(isMilestoneOnly(task({ start: '2026-01-05' }))).toBe(false)
     expect(isMilestoneOnly(task())).toBe(false)
     expect(isMilestoneOnly(task({ end: '2026-01-05', milestone: '2026-01-05' }))).toBe(false)
+  })
+})
+
+describe('groupAtDrop', () => {
+  const rows = [task({ group: 'A' }), task({ group: 'A' }), task({ group: 'B' }), task({ group: 'B' }), task({ group: 'C' })]
+
+  it('keeps the row’s group when dragged up to the top of its own group', () => {
+    expect(groupAtDrop(rows, 3, 2)).toBe('B')
+  })
+
+  it('keeps the row’s group when dragged down to the bottom of its own group', () => {
+    expect(groupAtDrop(rows, 0, 1)).toBe('A')
+  })
+
+  it('joins the group above when dropped among other groups', () => {
+    expect(groupAtDrop(rows, 4, 1)).toBe('A')
+    expect(groupAtDrop(rows, 4, 2)).toBe('A')
+  })
+
+  it('joins the first group when dropped at the very top', () => {
+    expect(groupAtDrop(rows, 4, 0)).toBe('A')
   })
 })

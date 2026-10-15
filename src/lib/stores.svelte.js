@@ -90,6 +90,18 @@ export function moveRow(index, delta) {
 
 // Drag-reorder: pull the row out, optionally re-home it into a group, and drop
 // it back at an absolute index (measured in the post-removal array).
+// The group a row joins when dropped at index `to`: its own group whenever
+// that borders the drop line, so moving within a group never changes it;
+// otherwise the group above the line, or below it at the very top.
+export function groupAtDrop(rows, from, to) {
+  const reduced = rows.filter((_, i) => i !== from)
+  const above = reduced[to - 1]?.group
+  const below = reduced[to]?.group
+  const own = rows[from].group
+  if (own === above || own === below) return own
+  return above ?? below ?? ''
+}
+
 export function reorderRow(from, to, group) {
   const [r] = store.rows.splice(from, 1)
   if (group !== undefined) r.group = group
