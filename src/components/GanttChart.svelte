@@ -349,7 +349,7 @@
 </div>
 
 {#if !store.readonly}
-  <div class="flex gap-1 border-t border-gt-line-soft px-4 py-2">
+  <div class="flex justify-center border-t border-gt-line-soft px-4 py-2">
     <Button variant="outline" size="icon" aria-label="Add row" title="Add row" onclick={appendRow}>＋</Button>
   </div>
 {/if}
