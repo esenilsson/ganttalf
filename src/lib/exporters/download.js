@@ -17,5 +17,5 @@ export function serializeSvg(svgEl) {
 // imported file's, minus its extension and characters filesystems reject.
 export function exportBaseName(chartName, fileName) {
   const name = (chartName?.trim() || fileName?.trim() || '').replace(/\.(xlsx|xls|csv)$/i, '')
-  return name.replace(/[\\/:*?"<>|]+/g, '-').trim() || 'Untitled project'
+  return name.replace(/[\\/:*?"<>|]+/g, '-').replace(/^[-\s]+|[-\s]+$/g, '') || 'Untitled project'
 }
