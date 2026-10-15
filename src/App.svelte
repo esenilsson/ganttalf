@@ -28,6 +28,7 @@
   let booted = false
   const hasRows = $derived(store.rows.length > 0)
   const baseName = $derived((store.fileName ?? 'ganttalf').replace(/\.(xlsx|xls|csv)$/i, ''))
+  const pptxName = $derived((store.chartName?.trim() || store.fileName?.trim() || 'Untitled project').replace(/\.(xlsx|xls|csv|pptx)$/i, ''))
 
   // Accept a dropped .xlsx anywhere on the page
   function onWindowDrop(e) {
@@ -207,7 +208,7 @@
         onexcel={() => exportWorkbook(store.rows, `${baseName}.xlsx`)}
         onpng={() => exportPng(chart.getSvg(), `${baseName}.png`)}
         onsvg={() => exportSvg(chart.getSvg(), `${baseName}.svg`)}
-        onpptx={() => exportPptx(chart.getLayout(), `${baseName}.pptx`)}
+        onpptx={() => exportPptx(chart.getLayout(), `${pptxName}.pptx`)}
       />
       {#if !store.readonly}
         <Button variant="ghost" onclick={() => { loadRows([], null); history.replaceState(null, '', '/') }}>Clear</Button>
