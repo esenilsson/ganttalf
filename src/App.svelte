@@ -9,6 +9,7 @@
   import { exportPng } from './lib/exporters/png.js'
   import { exportSvg } from './lib/exporters/svg.js'
   import { exportPptx } from './lib/exporters/pptx.js'
+  import { exportBaseName } from './lib/exporters/download.js'
   import { sampleRows } from './lib/sample.js'
   import GanttChart from './components/GanttChart.svelte'
   import RowTable from './components/RowTable.svelte'
@@ -27,8 +28,7 @@
   let sharedNotFound = $state(false)
   let booted = false
   const hasRows = $derived(store.rows.length > 0)
-  const baseName = $derived((store.fileName ?? 'ganttalf').replace(/\.(xlsx|xls|csv)$/i, ''))
-  const pptxName = $derived((store.chartName?.trim() || store.fileName?.trim() || 'Untitled project').replace(/\.(xlsx|xls|csv|pptx)$/i, ''))
+  const baseName = $derived(exportBaseName(store.chartName, store.fileName))
 
   // Accept a dropped .xlsx anywhere on the page
   function onWindowDrop(e) {
@@ -208,7 +208,7 @@
         onexcel={() => exportWorkbook(store.rows, `${baseName}.xlsx`)}
         onpng={() => exportPng(chart.getSvg(), `${baseName}.png`)}
         onsvg={() => exportSvg(chart.getSvg(), `${baseName}.svg`)}
-        onpptx={() => exportPptx(chart.getLayout(), `${pptxName}.pptx`)}
+        onpptx={() => exportPptx(chart.getLayout(), `${baseName}.pptx`)}
       />
       {#if !store.readonly}
         <Button variant="ghost" onclick={() => { loadRows([], null); history.replaceState(null, '', '/') }}>Clear</Button>
