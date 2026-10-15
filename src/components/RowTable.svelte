@@ -1,6 +1,6 @@
 <script>
   import { tick } from 'svelte'
-  import { store, addRow, deleteRow, moveRow, convertToMilestone, hasTaskDates, isMilestoneOnly } from '../lib/stores.svelte.js'
+  import { store, addRow, deleteRow, moveRow, convertToMilestone, hasTaskDates, isMilestoneOnly, addTentative } from '../lib/stores.svelte.js'
   import Button from './ui/Button.svelte'
 
   let rootEl
@@ -23,6 +23,18 @@
     convertToMilestone(index)
   }
 
+  async function addTentativeDate(index, key, col) {
+    addTentative(index, key)
+    await tick()
+    rootEl?.querySelector(`[data-cell="${index}:${col}"]`)?.focus()
+  }
+
+  async function removeTentativeDate(index, key, col) {
+    store.rows[index][key] = null
+    await tick()
+    rootEl?.querySelector(`[data-cell="${index}:${col}"]`)?.focus()
+  }
+
   // Spreadsheet-style navigation: Enter / Shift+Enter and ↑ / ↓ move focus to
   // the same column in the next/previous row. Date inputs keep plain arrows
   // for stepping the date — hold Alt to move rows there instead.
@@ -34,7 +46,7 @@
       dir = e.key === 'ArrowDown' ? 1 : -1
     }
     if (!dir) return
-    const next = rootEl?.querySelector(`input[data-cell="${row + dir}:${col}"]`)
+    const next = rootEl?.querySelector(`[data-cell="${row + dir}:${col}"]`)
     if (!next) return
     e.preventDefault()
     next.focus()
@@ -44,10 +56,10 @@
   const cols = [
     { key: 'group', label: 'Group', type: 'text', w: 'w-32' },
     { key: 'activity', label: 'Activity', type: 'text', w: 'min-w-64' },
-    { key: 'tentativeStart', label: 'Tent. start', type: 'date', w: 'w-36' },
+    { key: 'tentativeStart', label: 'Tent. start', type: 'date', w: 'w-36', optional: 'tentative start' },
     { key: 'start', label: 'Start', type: 'date', w: 'w-36' },
     { key: 'end', label: 'End', type: 'date', w: 'w-36' },
-    { key: 'tentativeEnd', label: 'Tent. end', type: 'date', w: 'w-36' },
+    { key: 'tentativeEnd', label: 'Tent. end', type: 'date', w: 'w-36', optional: 'tentative end' },
     { key: 'milestone', label: 'Milestone', type: 'date', w: 'w-36' },
     { key: 'responsible', label: 'Responsible', type: 'text', w: 'w-32' },
     { key: 'dependsOn', label: 'Depends on', type: 'text', w: 'w-40' },
@@ -69,7 +81,36 @@
         <tr class="border-b border-gt-line-soft transition-colors duration-[120ms] hover:bg-gt-rail">
           {#each cols as c, ci}
             <td class="px-1 py-1 align-middle">
-              {#if c.type === 'date'}
+              {#if c.optional && !row[c.key]}
+                <!-- Unused tentative dates stay empty until added, a week out by default -->
+                <button
+                  type="button"
+                  data-cell="{i}:{ci}"
+                  class="h-8 w-full rounded-[6px] border border-dashed border-gt-line text-sm text-gt-ink-faint transition-colors hover:border-input hover:text-gt-ink-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  aria-label="Add {c.optional}"
+                  title="Add {c.optional} (1 week out)"
+                  onclick={() => addTentativeDate(i, c.key, ci)}
+                  onkeydown={(e) => onCellKey(e, i, ci)}
+                >＋</button>
+              {:else if c.optional}
+                <div class="flex items-center gap-0.5">
+                  <input
+                    type="date"
+                    data-cell="{i}:{ci}"
+                    class="h-8 min-w-0 flex-1 rounded-[6px] border border-input bg-transparent px-2 text-sm tabular-nums focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                    value={row[c.key]}
+                    onchange={(e) => (row[c.key] = e.target.value || null)}
+                    onkeydown={(e) => onCellKey(e, i, ci)}
+                  />
+                  <button
+                    type="button"
+                    class="h-8 w-6 shrink-0 rounded-md text-xs text-gt-ink-faint transition-colors hover:bg-accent hover:text-gt-brick-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                    aria-label="Remove {c.optional}"
+                    title="Remove {c.optional}"
+                    onclick={() => removeTentativeDate(i, c.key, ci)}
+                  >✕</button>
+                </div>
+              {:else if c.type === 'date'}
                 <input
                   type="date"
                   data-cell="{i}:{ci}"

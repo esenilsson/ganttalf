@@ -1,7 +1,7 @@
 <script>
   import { computeLayout, FONT } from '../lib/layout.js'
   import { shiftIso, isoToDays, daysToIso } from '../lib/dates.js'
-  import { store, reorderRow, addRow } from '../lib/stores.svelte.js'
+  import { store, reorderRow, addRow, groupAtDrop } from '../lib/stores.svelte.js'
   import Button from './ui/Button.svelte'
 
   let svgEl = $state(null)
@@ -180,10 +180,7 @@
     const from = rd.index
     const to = rd.slot > from ? rd.slot - 1 : rd.slot
     if (to === from) return
-    // Adopt the group of the drop's new neighbours (prefer the row above).
-    const reduced = store.rows.filter((_, i) => i !== from)
-    const group = reduced[to - 1]?.group ?? reduced[to]?.group ?? ''
-    reorderRow(from, to, group)
+    reorderRow(from, to, groupAtDrop(store.rows, from, to))
   }
 
   function endDrag() {
