@@ -1,5 +1,5 @@
 import { newId } from './excel.js'
-import { todayIso } from './dates.js'
+import { todayIso, shiftIso } from './dates.js'
 
 export const store = $state({
   rows: [],
@@ -100,6 +100,14 @@ export function groupAtDrop(rows, from, to) {
   const own = rows[from].group
   if (own === above || own === below) return own
   return above ?? below ?? ''
+}
+
+// A tentative phase defaults to a week before the start / after the end.
+export function addTentative(index, key) {
+  const r = store.rows[index]
+  r[key] = key === 'tentativeStart'
+    ? shiftIso(r.start ?? r.end ?? r.milestone ?? todayIso(), -7)
+    : shiftIso(r.end ?? r.start ?? r.milestone ?? todayIso(), 7)
 }
 
 export function reorderRow(from, to, group) {

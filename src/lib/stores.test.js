@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { store, addRow, convertToMilestone, isMilestoneOnly, groupAtDrop } from './stores.svelte.js'
+import { store, addRow, convertToMilestone, isMilestoneOnly, groupAtDrop, addTentative } from './stores.svelte.js'
 
 const task = (fields) => ({
   group: 'G', activity: 'A', tentativeStart: null, start: null, end: null,
@@ -72,5 +72,23 @@ describe('groupAtDrop', () => {
 
   it('joins the first group when dropped at the very top', () => {
     expect(groupAtDrop(rows, 4, 0)).toBe('A')
+  })
+})
+
+describe('addTentative', () => {
+  it('starts a tentative phase a week before the start', () => {
+    addTentative(0, 'tentativeStart')
+    expect(store.rows[0].tentativeStart).toBe('2025-12-29')
+  })
+
+  it('ends a tentative phase a week after the end', () => {
+    addTentative(0, 'tentativeEnd')
+    expect(store.rows[0].tentativeEnd).toBe('2026-01-27')
+  })
+
+  it('falls back to today on an undated row', () => {
+    store.rows = [task()]
+    addTentative(0, 'tentativeEnd')
+    expect(store.rows[0].tentativeEnd).toBe('2026-10-22')
   })
 })
